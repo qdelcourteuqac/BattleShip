@@ -1,11 +1,12 @@
 package battleship.model.player;
 
-import battleship.model.board.Board;
+import battleship.model.board.PersonalBoard;
+import battleship.model.board.TacticalBoard;
 
 public abstract class Player {
 
-    public abstract Board getPersonalBoard();
-    public abstract Board getTacticalBoard();
+    public abstract PersonalBoard getPersonalBoard();
+    public abstract TacticalBoard getTacticalBoard();
 
     @Override
     public String toString() {

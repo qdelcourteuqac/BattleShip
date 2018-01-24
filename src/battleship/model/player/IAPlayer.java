@@ -1,15 +1,16 @@
 package battleship.model.player;
 
-import battleship.model.board.Board;
+import battleship.model.board.PersonalBoard;
+import battleship.model.board.TacticalBoard;
 
 public class IAPlayer extends Player {
     @Override
-    public Board getPersonalBoard() {
+    public PersonalBoard getPersonalBoard() {
         return null;
     }
 
     @Override
-    public Board getTacticalBoard() {
+    public TacticalBoard getTacticalBoard() {
         return null;
     }
 }

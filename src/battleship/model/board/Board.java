@@ -8,14 +8,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 
-public class Board {
+public abstract class Board {
 
     private static int HEIGHT = 10;
     private static int WIDTH = 10;
 
     private Cell[][] cells;
-
-    private ArrayList<Ship> ships;
 
     public Board() {
         this.cells = new Cell[WIDTH][HEIGHT];
@@ -24,8 +22,6 @@ public class Board {
                 this.clearCell(x, y);
             }
         }
-
-        this.ships = new ArrayList<>();
     }
 
     private Cell getCell(int x, int y) {
@@ -82,7 +78,6 @@ public class Board {
                 e.printStackTrace();
             }
         }
-        this.ships.add(ship);
     }
 
     public void translateShip(Ship ship, int xOffset, int yOffset) {
@@ -171,13 +166,6 @@ public class Board {
             boardRepresentation.append("---");
         }
         boardRepresentation.append("|");
-
-        if (!this.ships.isEmpty()) {
-            boardRepresentation.append("\n\nFleet:\n");
-            for (Ship ship: this.ships) {
-                boardRepresentation.append(ship.getClass().getSimpleName() + " " + ship.getHited() + "/3, ");
-            }
-        }
 
         return boardRepresentation.toString();
     }
