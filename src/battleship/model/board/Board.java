@@ -34,7 +34,7 @@ public abstract class Board {
      * Format d'entrée : A1 jusqu'à J10
      * où 10 est la valeur maximale en x
      */
-    private Cell getCell(String key) {
+    public Cell getCell(String key) {
         if (!key.matches("^[A-J]([1-9]|10)$")) {
             throw new IllegalArgumentException(String.format("The matching key \"%s\" doesn't exists", key));
         }
@@ -129,6 +129,16 @@ public abstract class Board {
         }
 
         return cells;
+    }
+
+    /**
+     * The player can fire at a target only if this cell is in his fire zone
+     *
+     * @param targetCell - Target cell on board
+     * @return boolean - Return true if the player can fire at specified cell
+     */
+    public boolean canFireAt(String targetCell) {
+        return true;
     }
 
     @Override

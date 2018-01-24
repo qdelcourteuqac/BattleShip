@@ -11,6 +11,10 @@ public class PersonalBoard extends Board {
         this.fleet = new Fleet();
     }
 
+    public void hitShip(Ship ship) {
+        this.fleet.hit(ship);
+    }
+
     @Override
     public void placeShip(Ship ship, int x, int y, boolean isVertical) {
         super.placeShip(ship, x, y, isVertical);

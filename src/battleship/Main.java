@@ -1,7 +1,6 @@
 package battleship;
 
-import battleship.model.board.Board;
-import battleship.model.board.Cell;
+import battleship.model.board.PersonalBoard;
 import battleship.model.player.HumanPlayer;
 import battleship.model.player.Player;
 import battleship.model.ship.Battleship;
@@ -14,7 +13,7 @@ public class Main {
 
         Player ramzi = new HumanPlayer();
 
-        Board board = ramzi.getPersonalBoard();
+        PersonalBoard board = ramzi.getPersonalBoard();
 
         Battleship battleship = new Battleship();
         Carrier carrier = new Carrier();
@@ -27,6 +26,11 @@ public class Main {
         board.placeShip(cruiser, 3, 1, true);
 
         board.translateShip(carrier, 1, 1);
+
+
+        System.out.println(ramzi);
+
+        System.out.println(ramzi.fire(ramzi, "I2"));
 
         System.out.println(ramzi);
     }

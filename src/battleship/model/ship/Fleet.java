@@ -22,6 +22,12 @@ public class Fleet {
         return this.ships.isEmpty();
     }
 
+    public void hit(Ship ship) {
+        if (this.ships.contains(ship)) {
+            this.ships.get(this.ships.indexOf(ship)).hit();
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder fleetRepresentation = new StringBuilder();
