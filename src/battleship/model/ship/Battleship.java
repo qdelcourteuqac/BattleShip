@@ -18,4 +18,9 @@ public class Battleship extends Ship {
     public int getRange() {
         return RANGE;
     }
+
+    @Override
+    public String toString() {
+        return "B";
+    }
 }
