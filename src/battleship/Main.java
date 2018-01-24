@@ -1,6 +1,7 @@
 package battleship;
 
 import battleship.model.board.Board;
+import battleship.model.board.Cell;
 import battleship.model.player.HumanPlayer;
 import battleship.model.player.Player;
 import battleship.model.ship.Battleship;
@@ -20,13 +21,13 @@ public class Main {
         Destroyer destroyer = new Destroyer();
         Cruiser cruiser = new Cruiser();
 
-        board.addShip(battleship, 0, 9, false);
-        board.addShip(carrier, 0, 0, true);
-        board.addShip(destroyer, 2, 0, false);
-        board.addShip(cruiser, 3, 1, true);
+        board.placeShip(battleship, 0, 9, false);
+        board.placeShip(carrier, 0, 0, true);
+        board.placeShip(destroyer, 2, 0, false);
+        board.placeShip(cruiser, 3, 1, true);
 
-        board.moveShip(carrier, 1, 1);
+        board.translateShip(carrier, 1, 1);
 
-        System.out.println(board);
+        System.out.println(ramzi);
     }
 }

@@ -19,10 +19,14 @@ public abstract class Ship {
         return isAlive;
     }
 
-    protected void hit() {
+    public void hit() {
         this.hited++;
         if (this.hited >= 3) {
             this.isAlive = false;
         }
+    }
+
+    public int getHited() {
+        return this.hited;
     }
 }
