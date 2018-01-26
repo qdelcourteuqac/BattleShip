@@ -2,12 +2,6 @@ package battleship.model.board;
 
 import battleship.model.ship.Ship;
 
-import java.sql.SQLSyntaxErrorException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.Function;
-
 public abstract class Board {
 
     private static int HEIGHT = 10;
@@ -86,7 +80,7 @@ public abstract class Board {
         }
 
         if (this.canTranslateShip(ship, xOffset, yOffset)) {
-            Cell[] cellsToTranslate = this.getCellsToTranslateForShip(ship);
+            Cell[] cellsToTranslate = this.getCellsOfShip(ship);
             try {
                 for(Cell cellToTranslate: cellsToTranslate) {
                     this.moveCell(cellToTranslate, cellToTranslate.getX() + xOffset, cellToTranslate.getY() + yOffset);
@@ -100,7 +94,7 @@ public abstract class Board {
     }
 
     private boolean canTranslateShip(Ship ship, int xOffset, int yOffset) {
-        Cell[] cells = this.getCellsToTranslateForShip(ship);
+        Cell[] cells = this.getCellsOfShip(ship);
         boolean canTranslate = true;
 
         for (Cell cellToTranslate : cells) {
@@ -114,7 +108,7 @@ public abstract class Board {
         return canTranslate;
     }
 
-    private Cell[] getCellsToTranslateForShip(Ship ship) {
+    private Cell[] getCellsOfShip(Ship ship) {
         Cell[] cells = new Cell[ship.getSize()];
         int index = 0;
 
