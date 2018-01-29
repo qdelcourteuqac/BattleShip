@@ -13,18 +13,19 @@ public abstract class Board {
         this.cells = new Cell[WIDTH][HEIGHT];
         for (int x = 0; x < WIDTH; x++) {
             for (int y = 0; y < HEIGHT; y++) {
-                this.clearCell(x, y);
+                Coordinate coordinate = new Coordinate(x, y);
+                this.clearCell(coordinate);
             }
         }
     }
 
-    private Cell getCell(int x, int y) {
-        return this.cells[x][y];
+    private Cell getCell(Coordinate $coordinate) {
+        return this.cells[$coordinate.getX()][$coordinate.getY()];
     }
 
     /**
      * TODO: trouver un meilleur nom de variable
-     *
+     * <p>
      * Format d'entrée : A1 jusqu'à J10
      * où 10 est la valeur maximale en x
      */
@@ -37,11 +38,12 @@ public abstract class Board {
         int x = Integer.parseInt(key.substring(1, key.length())) - 1;
         int y = WIDTH - (Character.getNumericValue(key.charAt(0)) - Character.getNumericValue('A')) - 1;
 
-        return this.getCell(x, y);
+        Coordinate coordinate = new Coordinate(x, y);
+        return this.getCell(coordinate);
     }
 
-    private void clearCell(int x, int y) {
-        this.cells[x][y] = new Cell(null, x, y);
+    private void clearCell(Coordinate coordinate) {
+        this.cells[coordinate.getX()][coordinate.getY()] = new Cell(null, coordinate.getX(), coordinate.getY());
     }
 
     private void addCell(Cell cell, int x, int y) throws Exception {
@@ -58,12 +60,16 @@ public abstract class Board {
 
         this.addCell(cell, toX, toY);
         System.out.printf("Moving from %s:%s, to %s:%s.\n", fromX, fromY, toX, toY);
-        this.clearCell(fromX, fromY);
+        Coordinate coordinate = new Coordinate(fromX, fromY);
+        this.clearCell(coordinate);
     }
 
-    public void placeShip(Ship ship, int x, int y, boolean isVertical) {
+    public void placeShip(Ship ship, Coordinate coordinate, boolean isVertical) {
         for (int part = 0; part < ship.getSize(); part++) {
             try {
+                int x = coordinate.getX();
+                int y = coordinate.getY();
+
                 int xCell = isVertical ? x : x + part;
                 int yCell = isVertical ? y + part : y;
                 Cell cell = new Cell(ship, xCell, yCell);
@@ -74,22 +80,23 @@ public abstract class Board {
         }
     }
 
-    public void translateShip(Ship ship, int xOffset, int yOffset) {
+    public void translateShip(Ship ship, int xOffset, int yOffset) throws Exception {
         if (xOffset + yOffset > 2) {
             throw new IllegalArgumentException("You can only perform maximum two cell moving !");
         }
 
-        if (this.canTranslateShip(ship, xOffset, yOffset)) {
-            Cell[] cellsToTranslate = this.getCellsOfShip(ship);
-            try {
-                for(Cell cellToTranslate: cellsToTranslate) {
-                    this.moveCell(cellToTranslate, cellToTranslate.getX() + xOffset, cellToTranslate.getY() + yOffset);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (!this.canTranslateShip(ship, xOffset, yOffset)) {
+            throw new Exception(String.format("Impossible to move ship %s with offset : %d:%d", ship.getClass().getSimpleName(), xOffset, yOffset));
+        }
+
+
+        Cell[] cellsToTranslate = this.getCellsOfShip(ship);
+        try {
+            for (Cell cellToTranslate : cellsToTranslate) {
+                this.moveCell(cellToTranslate, cellToTranslate.getX() + xOffset, cellToTranslate.getY() + yOffset);
             }
-        } else {
-            System.out.println(String.format("Impossible to move ship %s with offset : %d:%d", ship.getClass().getSimpleName(), xOffset, yOffset));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -112,9 +119,11 @@ public abstract class Board {
         Cell[] cells = new Cell[ship.getSize()];
         int index = 0;
 
-        for (int y = HEIGHT - 1; y >= 0; y--) {
+        for (int y = 0; y < HEIGHT; y++) {
             for (int x = 0; x < WIDTH; x++) {
-                Cell cell = this.getCell(x, y);
+                Coordinate coordinate = new Coordinate(x, y);
+                Cell cell = this.getCell(coordinate);
+
                 if (null != cell.getShip() && cell.getShip().equals(ship)) {
                     cells[index] = new Cell(ship, cell.getX(), cell.getY());
                     index++;
@@ -139,15 +148,11 @@ public abstract class Board {
     public String toString() {
         StringBuilder boardRepresentation = new StringBuilder();
 
-        boardRepresentation.append("\n");
-        boardRepresentation.append("  |");
+        boardRepresentation.append("\n  |");
         for (int x = 0; x < WIDTH; x++) {
-            boardRepresentation.append(String.format(" %d ", x+1));
+            boardRepresentation.append(String.format(" %d ", x + 1));
         }
-        boardRepresentation.append("|");
-
-        boardRepresentation.append("\n");
-        boardRepresentation.append("  |");
+        boardRepresentation.append("|\n  |");
         for (int x = 0; x < WIDTH; x++) {
             boardRepresentation.append("---");
         }
@@ -158,14 +163,15 @@ public abstract class Board {
             boardRepresentation.append("\n");
             boardRepresentation.append(String.format("%s |", startLetter++));
             for (int x = 0; x < WIDTH; x++) {
-                Cell cell = this.getCell(x, y);
+                Coordinate coordinate = new Coordinate(x, y);
+                Cell cell = this.getCell(coordinate);
+
                 boardRepresentation.append(cell);
             }
             boardRepresentation.append("|");
         }
 
-        boardRepresentation.append("\n");
-        boardRepresentation.append("  |");
+        boardRepresentation.append("\n  |");
         for (int x = 0; x < WIDTH; x++) {
             boardRepresentation.append("---");
         }

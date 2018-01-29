@@ -15,7 +15,7 @@ public abstract class Player {
      *
      * @param opponent - Player to attack
      * @param targetCell - Target cell in opponent board
-     * @return boolean - Return false if missed, true if hited
+     * @return boolean - Return false if missed, true if hit
      */
     public boolean fire(Player opponent, String targetCell) {
         if (!this.getPersonalBoard().canFireAt(targetCell)) {
