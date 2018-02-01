@@ -2,6 +2,8 @@ package battleship.model.board;
 
 import battleship.model.ship.Ship;
 
+import java.lang.reflect.WildcardType;
+
 public abstract class Board {
 
     private static int HEIGHT = 10;
@@ -23,13 +25,17 @@ public abstract class Board {
         return this.cells[$coordinate.getX()][$coordinate.getY()];
     }
 
-    /**
-     * TODO: trouver un meilleur nom de variable
-     * <p>
-     * Format d'entrée : A1 jusqu'à J10
-     * où 10 est la valeur maximale en x
-     */
     public Cell getCell(String key) {
+        return this.getCell(this.getCoordinate(key));
+    }
+
+    /**
+     * Input format : from A1 to J10
+     * where 10 is the max value in x
+     *
+     * @param key - Cell key
+     */
+    private Coordinate getCoordinate(String key) {
         if (!key.matches("^[A-J]([1-9]|10)$")) {
             throw new IllegalArgumentException(String.format("The matching key \"%s\" doesn't exists", key));
         }
@@ -38,8 +44,7 @@ public abstract class Board {
         int x = Integer.parseInt(key.substring(1, key.length())) - 1;
         int y = WIDTH - (Character.getNumericValue(key.charAt(0)) - Character.getNumericValue('A')) - 1;
 
-        Coordinate coordinate = new Coordinate(x, y);
-        return this.getCell(coordinate);
+        return new Coordinate(x, y);
     }
 
     private void clearCell(Coordinate coordinate) {
@@ -141,7 +146,48 @@ public abstract class Board {
      * @return boolean - Return true if the player can fire at specified cell
      */
     public boolean canFireAt(String targetCell) {
-        return true;
+        boolean[][] matrix = new boolean[WIDTH][HEIGHT];
+
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                Cell cell = this.getCell(new Coordinate(x, y));
+
+                if (cell.getShip() != null) {
+                    matrix[x][y] = true;
+                    for (int k = 1; k < cell.getShip().getRange(); k++) {
+                        if ((x+k) < WIDTH) {
+                            matrix[x+k][y] = true;
+                        }
+			if ((x-k) >= 0) {
+			    matrix[x-k][y] = true;
+			}
+                        if ((y+k) < HEIGHT) {
+                            matrix[x][y+k] = true;
+                        }
+                        if ((y-k) >= 0) {
+			    matrix[x][y-k] = true;
+			}
+                    }
+                }
+            }
+        }
+
+        StringBuilder fireRangeMatrix = new StringBuilder();
+        fireRangeMatrix.append("Fire matrix");
+
+        for (int y = HEIGHT - 1; y >= 0; y--) {
+            fireRangeMatrix.append("\n");
+            for (int x = 0; x < WIDTH; x++) {
+                fireRangeMatrix.append(matrix[x][y] ? "1" : "0");
+            }
+        }
+
+        System.out.println(fireRangeMatrix);
+
+        Coordinate coordinate = this.getCoordinate(targetCell);
+        System.out.println("Can fire at " + coordinate + " = " + matrix[coordinate.getX()][coordinate.getY()]);
+
+        return matrix[coordinate.getX()][coordinate.getY()];
     }
 
     @Override

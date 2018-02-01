@@ -26,6 +26,7 @@ public abstract class Player {
         if (cell.getShip() != null) {
             opponent.getPersonalBoard().hitShip(cell.getShip());
             // TODO: Add flag on tactical board
+            System.out.println("Fire !!!");
             return true;
         }
 
