@@ -1,7 +1,5 @@
 package battleship.model.ship;
 
-import java.util.Random;
-
 /**
  * Torpilleur
  */

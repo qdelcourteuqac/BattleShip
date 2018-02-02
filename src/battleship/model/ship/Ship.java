@@ -2,7 +2,6 @@ package battleship.model.ship;
 
 public abstract class Ship {
 
-
     public abstract int getSize();
     public abstract int getRange();
 

@@ -4,31 +4,32 @@ import battleship.model.ship.Ship;
 
 public class Cell {
 
-    private Ship ship;
+    private Object object;
+    private Coordinate coordinate;
 
-    private int x;
-    private int y;
-
-    public Cell(Ship ship, int x, int y) {
-        this.ship = ship;
-        this.x = x;
-        this.y = y;
+    public Cell(Object object, Coordinate coordinate) {
+        this.object = object;
+        this.coordinate = coordinate;
     }
 
     public Ship getShip() {
-        return ship;
+        return (this.object instanceof Ship)? (Ship) this.object : null;
+    }
+
+    public Flag getFlag() {
+        return (this.object instanceof Flag)? (Flag) this.object : null;
     }
 
     public int getX() {
-        return this.x;
+        return this.coordinate.getX();
     }
 
     public int getY() {
-        return this.y;
+        return this.coordinate.getY();
     }
 
     @Override
     public String toString() {
-        return this.ship == null ? " * " : " " + this.ship.toString() + " ";
+        return this.object == null ? " * " : " " + this.object.toString() + " ";
     }
 }

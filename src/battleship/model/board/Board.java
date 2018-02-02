@@ -2,14 +2,12 @@ package battleship.model.board;
 
 import battleship.model.ship.Ship;
 
-import java.lang.reflect.WildcardType;
-
 public abstract class Board {
 
-    private static int HEIGHT = 10;
-    private static int WIDTH = 10;
+    protected static int HEIGHT = 10;
+    protected static int WIDTH = 10;
 
-    private Cell[][] cells;
+    protected Cell[][] cells;
 
     public Board() {
         this.cells = new Cell[WIDTH][HEIGHT];
@@ -21,8 +19,8 @@ public abstract class Board {
         }
     }
 
-    private Cell getCell(Coordinate $coordinate) {
-        return this.cells[$coordinate.getX()][$coordinate.getY()];
+    protected Cell getCell(Coordinate coordinate) {
+        return this.cells[coordinate.getX()][coordinate.getY()];
     }
 
     public Cell getCell(String key) {
@@ -35,7 +33,7 @@ public abstract class Board {
      *
      * @param key - Cell key
      */
-    private Coordinate getCoordinate(String key) {
+    protected Coordinate getCoordinate(String key) {
         if (!key.matches("^[A-J]([1-9]|10)$")) {
             throw new IllegalArgumentException(String.format("The matching key \"%s\" doesn't exists", key));
         }
@@ -47,10 +45,23 @@ public abstract class Board {
         return new Coordinate(x, y);
     }
 
-    private void clearCell(Coordinate coordinate) {
-        this.cells[coordinate.getX()][coordinate.getY()] = new Cell(null, coordinate.getX(), coordinate.getY());
+    /**
+     * Clear cell by initialize a new Cell in it
+     *
+     * @param coordinate - Coordinate of cell to clear
+     */
+    protected void clearCell(Coordinate coordinate) {
+        this.cells[coordinate.getX()][coordinate.getY()] = new Cell(null, coordinate);
     }
 
+    /**
+     * Add cell
+     *
+     * @param cell - Cell
+     * @param x - x
+     * @param y - y
+     * @throws Exception
+     */
     private void addCell(Cell cell, int x, int y) throws Exception {
         if (this.cells[x][y].getShip() != null) {
             throw new Exception("This cell contains a ship ! ");
@@ -59,6 +70,14 @@ public abstract class Board {
         this.cells[x][y] = cell;
     }
 
+    /**
+     * Move cell to X, Y position on the board
+     *
+     * @param cell - Cell to move
+     * @param toX - To X
+     * @param toY - To Y
+     * @throws Exception
+     */
     private void moveCell(Cell cell, int toX, int toY) throws Exception {
         int fromX = cell.getX();
         int fromY = cell.getY();
@@ -69,6 +88,13 @@ public abstract class Board {
         this.clearCell(coordinate);
     }
 
+    /**
+     * Place ship on the board
+     *
+     * @param ship - Ship to place
+     * @param coordinate - Coordinate to place the ship
+     * @param isVertical - Orientation: Vertical if true, horizontal otherwise
+     */
     public void placeShip(Ship ship, Coordinate coordinate, boolean isVertical) {
         for (int part = 0; part < ship.getSize(); part++) {
             try {
@@ -77,7 +103,7 @@ public abstract class Board {
 
                 int xCell = isVertical ? x : x + part;
                 int yCell = isVertical ? y + part : y;
-                Cell cell = new Cell(ship, xCell, yCell);
+                Cell cell = new Cell(ship, new Coordinate(xCell, yCell));
                 this.addCell(cell, xCell, yCell);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -85,6 +111,14 @@ public abstract class Board {
         }
     }
 
+    /**
+     * Translate Ship with offset on X and Y
+     *
+     * @param ship - Ship to translate
+     * @param xOffset - Offset X
+     * @param yOffset - Offset Y
+     * @throws Exception
+     */
     public void translateShip(Ship ship, int xOffset, int yOffset) throws Exception {
         if (xOffset + yOffset > 2) {
             throw new IllegalArgumentException("You can only perform maximum two cell moving !");
@@ -105,6 +139,14 @@ public abstract class Board {
         }
     }
 
+    /**
+     * Return true if ship can be translate, false otherwise
+     *
+     * @param ship - Ship to translate
+     * @param xOffset - Offset X
+     * @param yOffset - Offset Y
+     * @return boolean
+     */
     private boolean canTranslateShip(Ship ship, int xOffset, int yOffset) {
         Cell[] cells = this.getCellsOfShip(ship);
         boolean canTranslate = true;
@@ -120,6 +162,12 @@ public abstract class Board {
         return canTranslate;
     }
 
+    /**
+     * Return array of cell in which the ship is inside
+     *
+     * @param ship - Ship
+     * @return Cell[]
+     */
     private Cell[] getCellsOfShip(Ship ship) {
         Cell[] cells = new Cell[ship.getSize()];
         int index = 0;
@@ -130,7 +178,7 @@ public abstract class Board {
                 Cell cell = this.getCell(coordinate);
 
                 if (null != cell.getShip() && cell.getShip().equals(ship)) {
-                    cells[index] = new Cell(ship, cell.getX(), cell.getY());
+                    cells[index] = new Cell(ship, new Coordinate(cell.getX(), cell.getY()));
                     index++;
                 }
             }
@@ -154,38 +202,25 @@ public abstract class Board {
 
                 if (cell.getShip() != null) {
                     matrix[x][y] = true;
-                    for (int k = 1; k < cell.getShip().getRange(); k++) {
+                    for (int k = 1; k <= cell.getShip().getRange(); k++) {
                         if ((x+k) < WIDTH) {
                             matrix[x+k][y] = true;
                         }
-			if ((x-k) >= 0) {
-			    matrix[x-k][y] = true;
-			}
+			            if ((x-k) >= 0) {
+			                matrix[x-k][y] = true;
+			            }
                         if ((y+k) < HEIGHT) {
                             matrix[x][y+k] = true;
                         }
                         if ((y-k) >= 0) {
-			    matrix[x][y-k] = true;
-			}
+			                matrix[x][y-k] = true;
+			            }
                     }
                 }
             }
         }
 
-        StringBuilder fireRangeMatrix = new StringBuilder();
-        fireRangeMatrix.append("Fire matrix");
-
-        for (int y = HEIGHT - 1; y >= 0; y--) {
-            fireRangeMatrix.append("\n");
-            for (int x = 0; x < WIDTH; x++) {
-                fireRangeMatrix.append(matrix[x][y] ? "1" : "0");
-            }
-        }
-
-        System.out.println(fireRangeMatrix);
-
         Coordinate coordinate = this.getCoordinate(targetCell);
-        System.out.println("Can fire at " + coordinate + " = " + matrix[coordinate.getX()][coordinate.getY()]);
 
         return matrix[coordinate.getX()][coordinate.getY()];
     }

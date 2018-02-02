@@ -23,14 +23,15 @@ public abstract class Player {
         }
 
         Cell cell = opponent.getPersonalBoard().getCell(targetCell);
-        if (cell.getShip() != null) {
-            opponent.getPersonalBoard().hitShip(cell.getShip());
-            // TODO: Add flag on tactical board
-            System.out.println("Fire !!!");
-            return true;
+        if (cell.getShip() == null) {
+            this.getTacticalBoard().missedFlag(targetCell);
+            return false;
         }
 
-        return false;
+        opponent.getPersonalBoard().hitShip(cell.getShip());
+        opponent.getTacticalBoard().hitFlag(targetCell);
+        System.out.println("Fire !!!");
+        return true;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package battleship.model.ship;
 
 import java.util.ArrayList;
+import java.util.Observable;
 
 public class Fleet {
 

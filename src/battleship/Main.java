@@ -38,5 +38,9 @@ public class Main {
         System.out.println(ramzi.fire(ramzi, "I2"));
 
         System.out.println(ramzi);
+
+        System.out.println(ramzi.fire(ramzi, "J1"));
+
+        System.out.println(ramzi);
     }
 }
