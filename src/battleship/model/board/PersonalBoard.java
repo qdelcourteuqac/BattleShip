@@ -11,8 +11,12 @@ public class PersonalBoard extends Board {
         this.fleet = new Fleet();
     }
 
-    public void hitShip(Ship ship) {
-        this.fleet.hit(ship);
+    public Fleet getFleet() {
+        return this.fleet;
+    }
+
+    public boolean hitShip(Ship ship) {
+        return this.fleet.hit(ship);
     }
 
     @Override

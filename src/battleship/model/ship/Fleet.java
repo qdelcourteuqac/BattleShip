@@ -23,10 +23,8 @@ public class Fleet {
         return this.ships.isEmpty();
     }
 
-    public void hit(Ship ship) {
-        if (this.ships.contains(ship)) {
-            this.ships.get(this.ships.indexOf(ship)).hit();
-        }
+    public boolean hit(Ship ship) {
+        return (this.ships.contains(ship)) && this.ships.get(this.ships.indexOf(ship)).hit();
     }
 
     @Override

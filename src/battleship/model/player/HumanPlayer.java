@@ -1,25 +1,17 @@
 package battleship.model.player;
 
-import battleship.model.board.PersonalBoard;
-import battleship.model.board.TacticalBoard;
+import battleship.model.board.BoardController;
 
 public class HumanPlayer extends Player {
 
-    private PersonalBoard personalBoard;
-    private TacticalBoard tacticalBoard;
+    private BoardController boardController;
 
     public HumanPlayer() {
-        this.personalBoard = new PersonalBoard();
-        this.tacticalBoard = new TacticalBoard();
+        this.boardController = new BoardController();
     }
 
     @Override
-    public PersonalBoard getPersonalBoard() {
-        return this.personalBoard;
-    }
-
-    @Override
-    public TacticalBoard getTacticalBoard() {
-        return this.tacticalBoard;
+    public BoardController getBoardController() {
+        return this.boardController;
     }
 }

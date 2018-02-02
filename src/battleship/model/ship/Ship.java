@@ -18,11 +18,17 @@ public abstract class Ship {
         return isAlive;
     }
 
-    public void hit() {
+    public boolean hit() {
+        if (!this.isAlive()) {
+            return false;
+        }
+
         this.hited++;
         if (this.hited >= 3) {
             this.isAlive = false;
         }
+
+        return true;
     }
 
     public int getHited() {
