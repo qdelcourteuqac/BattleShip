@@ -13,4 +13,9 @@ public class IAPlayer extends Player {
     public BoardController getBoardController() {
         return this.boardController;
     }
+
+    @Override
+    public boolean hasFleet() {
+        return !this.boardController.getFleet().isEmpty();
+    }
 }

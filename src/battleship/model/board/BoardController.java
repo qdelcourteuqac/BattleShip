@@ -61,7 +61,7 @@ public class BoardController {
         }
 
         opponent.getBoardController().getPersonalBoard().hitShip(cell.getShip());
-        opponent.getBoardController().getTacticalBoard().hitFlag(targetCell);
+        this.getTacticalBoard().hitFlag(targetCell);
 
         /**
          * TODO:Lors d'un hit d'un bateau vérifier si le bateau est encore vivant, si oui alors tranquille
