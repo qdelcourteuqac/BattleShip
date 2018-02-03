@@ -2,7 +2,7 @@ package battleship.model;
 
 import battleship.model.player.HumanPlayer;
 import battleship.model.player.Player;
-import battleship.model.ship.Ship;
+import battleship.model.ship.*;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -23,8 +23,8 @@ public class GameController implements IGameController {
         this.player1 = new HumanPlayer();
         this.player2 = new HumanPlayer();
 
-        this.player1.setName("player1");
-        this.player2.setName("player2");
+        this.player1.setName("Player 1");
+        this.player2.setName("Player 2");
     }
 
     /**
@@ -32,9 +32,11 @@ public class GameController implements IGameController {
      */
     private void game() {
         //Pas obligatoire
-        this.initPlayers();
+        //this.initPlayers();
 
-        boolean shotHit = false;
+        this.initFleet();
+
+        boolean shotHit = true;
 
         // Tant que la partie n'est pas finie
         while(!this.isFinished()) {
@@ -44,11 +46,49 @@ public class GameController implements IGameController {
         }
     }
 
+    /**
+     * Init Phase : set player's name
+     */
     private void initPlayers() {
         System.out.print("\nPlayer 1 name : ");
         this.player1.setName(this.scanner.nextLine());
         System.out.print("Player 2 name : ");
         this.player2.setName(this.scanner.nextLine());
+    }
+
+    /**
+     * Init Phase : place fleet on player's board
+     */
+    private void initFleet() {
+        System.out.println("\nWelcome in ship placement system !");
+
+        Player[] players = new Player[]{this.player1, this.player2};
+
+        Class[] ships = new Class[]{Battleship.class, Carrier.class, Destroyer.class, Cruiser.class};
+
+        for (Player player : players) {
+            System.out.printf("%s it's to you to choose !\n", player.getName());
+            for (Class shipClass : ships) {
+                System.out.println(player);
+                try {
+                    Ship ship = (Ship) shipClass.newInstance();
+
+                    System.out.printf("Place a %s(%d) in (i.e: J2) : ", shipClass.getSimpleName(), ship.getSize());
+                    String targetCell = this.scanner.nextLine();
+                    System.out.println("In vertical (y/n) : ");
+                    String response = this.scanner.nextLine();
+                    boolean isVertical = false;
+                    if (response.equals("y")) {
+                        isVertical = true;
+                    }
+                    player.getBoardController().getPersonalBoard().placeShip(ship, targetCell, isVertical);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -63,6 +103,7 @@ public class GameController implements IGameController {
 
         if (!hasOpponentShotHit) {
             // The current player have the possibility to move one of his ships
+            // TODO: terminer cette étape
             System.out.println("Your opponent have missed his shot.");
             System.out.print("Do you want move one of your ships ? (y/n) : ");
             String response = this.scanner.nextLine();
@@ -79,13 +120,20 @@ public class GameController implements IGameController {
                     String responseShip = this.scanner.nextLine();
                     if (responseShip.equals("y")) {
                         System.out.println("Enter offset (i.e : 1 1) : ");
-                        String offsets = this.scanner.nextLine();
-                        System.out.println(offsets);
+                        String offsetsResponse = this.scanner.nextLine();
+                        System.out.println(offsetsResponse);
+                        String[] offsets = offsetsResponse.split(" ");
+                        try {
+                            player.getBoardController().getPersonalBoard().translateShip(ships.get(index), Integer.parseInt(offsets[0]), Integer.parseInt(offsets[1]));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
         }
 
+        // TODO: revoir (peut etre) les messages dans la console
         System.out.print("\nType the target cell to fire (i.e : I3) : ");
         String targetCell = this.scanner.nextLine();
         System.out.println("Fire on this piece of shit !!!");

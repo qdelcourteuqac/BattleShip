@@ -96,6 +96,7 @@ public abstract class Board {
      * @param isVertical - Orientation: Vertical if true, horizontal otherwise
      */
     public void placeShip(Ship ship, Coordinate coordinate, boolean isVertical) {
+        // TODO: Attention en placant un bateau vers le bord de la map,vérifier qu'il n'en sort pas avant de la placer
         for (int part = 0; part < ship.getSize(); part++) {
             try {
                 int x = coordinate.getX();
@@ -109,6 +110,11 @@ public abstract class Board {
                 e.printStackTrace();
             }
         }
+    }
+
+
+    public void placeShip(Ship ship, String targetCell, boolean isVertical) {
+        this.placeShip(ship, this.getCoordinate(targetCell), isVertical);
     }
 
     /**

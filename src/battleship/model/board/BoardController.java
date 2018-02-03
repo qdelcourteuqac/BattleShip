@@ -11,23 +11,6 @@ public class BoardController {
     public BoardController() {
         this.personalBoard = new PersonalBoard();
         this.tacticalBoard = new TacticalBoard();
-
-        Battleship battleship = new Battleship();
-        Carrier carrier = new Carrier();
-        Destroyer destroyer = new Destroyer();
-        Cruiser cruiser = new Cruiser();
-
-        this.personalBoard.placeShip(battleship, new Coordinate(0, 9), false);
-        this.personalBoard.placeShip(carrier, new Coordinate(0, 0), true);
-        this.personalBoard.placeShip(destroyer, new Coordinate(2, 0), false);
-        this.personalBoard.placeShip(cruiser, new Coordinate(3, 1), true);
-
-        try {
-            this.personalBoard.translateShip(carrier, 1, 1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
     }
 
     public PersonalBoard getPersonalBoard() {
@@ -63,11 +46,6 @@ public class BoardController {
         opponent.getBoardController().getPersonalBoard().hitShip(cell.getShip());
         this.getTacticalBoard().hitFlag(targetCell);
 
-        /**
-         * TODO:Lors d'un hit d'un bateau vérifier si le bateau est encore vivant, si oui alors tranquille
-         * (on lui enleve 1 pt de vie), si non (il est mort) bah on ne peut plus tirer dessus et son range d'action
-         * n'est plus prit en compte lors d'un tir
-         */
         return true;
     }
 

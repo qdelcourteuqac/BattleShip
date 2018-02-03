@@ -17,6 +17,6 @@ public class HumanPlayer extends Player {
 
     @Override
     public boolean hasFleet() {
-        return !this.boardController.getFleet().isEmpty();
+        return this.boardController.getFleet().isEmpty();
     }
 }

@@ -1,7 +1,6 @@
 package battleship.model.ship;
 
 import java.util.ArrayList;
-import java.util.Observable;
 
 public class Fleet {
 
@@ -20,10 +19,11 @@ public class Fleet {
     }
 
     public boolean isEmpty() {
-        return this.ships.isEmpty();
+        return !this.ships.isEmpty();
     }
 
     public boolean hit(Ship ship) {
+        // TODO: si le bateau n'a plus de vie alors le supprimer de la flotte
         return (this.ships.contains(ship)) && this.ships.get(this.ships.indexOf(ship)).hit();
     }
 
@@ -31,7 +31,7 @@ public class Fleet {
     public String toString() {
         StringBuilder fleetRepresentation = new StringBuilder();
 
-        if (!this.isEmpty()) {
+        if (this.isEmpty()) {
             fleetRepresentation.append("\n\nFleet:\n");
             for (Ship ship: this.getShips()) {
                 fleetRepresentation.append(ship.getClass().getSimpleName() + " " + ship.getHited() + "/3, ");
