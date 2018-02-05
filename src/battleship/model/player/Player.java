@@ -58,7 +58,7 @@ public abstract class Player {
     /**
      * Place the ship in the personal board's player
      *
-     * @param ship - Ship to place
+     * @param ship             - Ship to place
      * @param targetCoordinate - Target Cell
      * @throws ShipOutOfBoardException, CellNotEmptyException, CoordinateOutOfBoardException
      */

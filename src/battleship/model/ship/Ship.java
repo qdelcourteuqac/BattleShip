@@ -7,6 +7,7 @@ public abstract class Ship {
     }
 
     public abstract int getSize();
+
     public abstract int getRange();
 
     protected Ship.Orientation orientation;

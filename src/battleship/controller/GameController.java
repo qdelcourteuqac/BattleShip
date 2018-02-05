@@ -2,6 +2,7 @@ package battleship.controller;
 
 import battleship.model.player.Player;
 import battleship.utils.Coordinate;
+
 import java.util.Scanner;
 
 public class GameController implements IGameController {
@@ -99,7 +100,6 @@ public class GameController implements IGameController {
      * Return the opponent's player
      *
      * @param player - Player who want to know its opponent
-     *
      * @return Player
      */
     private Player getOpponent(Player player) {

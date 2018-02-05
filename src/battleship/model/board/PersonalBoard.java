@@ -73,16 +73,13 @@ public class PersonalBoard extends Board {
     /**
      * Verify if a ship can be placed in a required coordinate
      *
-     * @param ship - Ship to place
+     * @param ship       - Ship to place
      * @param coordinate - Coordinate to place
-     *
      * @return boolean
-     *
      * @throws CoordinateOutOfBoardException
      * @throws ShipOutOfBoardException
      */
     private boolean canPlaceShip(Ship ship, Coordinate coordinate) throws CoordinateOutOfBoardException, ShipOutOfBoardException {
-        System.out.println("Check in : "+coordinate);
         if (coordinate.getX() < 0 || coordinate.getX() >= WIDTH || coordinate.getY() < 0 || coordinate.getY() >= HEIGHT) {
             throw new CoordinateOutOfBoardException();
         }

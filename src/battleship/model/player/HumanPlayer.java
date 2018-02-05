@@ -5,7 +5,6 @@ import battleship.model.board.Board;
 import battleship.model.ship.*;
 import battleship.utils.Coordinate;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -29,15 +28,13 @@ public class HumanPlayer extends Player {
                     System.out.println("In vertical (y/n) : ");
                     String response = scanner.nextLine();
                     Ship.Orientation orientation = response.equals("y") ? Ship.Orientation.VERTICAL : Ship.Orientation.HORIZONTAL;
-
                     Ship ship = (Ship) shipClass.getConstructor(Ship.Orientation.class).newInstance(orientation);
-
                     System.out.printf("Place a %s(%d) in (i.e: J2) : ", shipClass.getSimpleName(), ship.getSize());
 
                     Coordinate targetCoordinate = Board.getCoordinate(scanner.nextLine());
-
                     this.placeShip(ship, targetCoordinate);
                     shipPlaced = true;
+
                 } catch (ShipOutOfBoardException e) {
                     System.out.println("You cannot place your ship here : is getting out the board");
                 } catch (CoordinateOutOfBoardException e) {
@@ -49,8 +46,6 @@ public class HumanPlayer extends Player {
                 }
             }
         }
-
-        scanner.close();
     }
 
     @Override

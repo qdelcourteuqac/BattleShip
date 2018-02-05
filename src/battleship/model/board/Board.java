@@ -55,7 +55,6 @@ public abstract class Board {
      * Add cell
      *
      * @param cell - Cell
-     *
      * @throws CellNotEmptyException
      */
     protected void addCell(Cell cell) throws CellNotEmptyException {
@@ -76,7 +75,6 @@ public abstract class Board {
      * @param cell - Cell to move
      * @param toX  - To X
      * @param toY  - To Y
-     *
      * @throws CellNotEmptyException
      */
     protected void moveCell(Cell cell, int toX, int toY) throws CellNotEmptyException {

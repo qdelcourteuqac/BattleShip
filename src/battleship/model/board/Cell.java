@@ -18,11 +18,11 @@ public class Cell {
     }
 
     public Ship getShip() {
-        return (this.object instanceof Ship)? (Ship) this.object : null;
+        return (this.object instanceof Ship) ? (Ship) this.object : null;
     }
 
     public Flag getFlag() {
-        return (this.object instanceof Flag)? (Flag) this.object : null;
+        return (this.object instanceof Flag) ? (Flag) this.object : null;
     }
 
     public Coordinate getCoordinate() {
