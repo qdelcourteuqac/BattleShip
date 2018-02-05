@@ -1,60 +1,26 @@
 package battleship.model.player;
 
-import battleship.model.board.*;
-import battleship.model.ship.Fleet;
-import battleship.model.ship.Ship;
+import battleship.model.board.Board;
+import battleship.model.ship.*;
 import battleship.utils.Coordinate;
 
 import java.util.Random;
 
 public class IAPlayer extends Player {
 
-    private PersonalBoard personalBoard;
-    private TacticalBoard tacticalBoard;
-
-    public IAPlayer() {
-        this.personalBoard = new PersonalBoard();
-        this.tacticalBoard = new TacticalBoard();
-    }
-
     @Override
-    public void placeShip(Ship ship, Coordinate targetCoordinate, boolean isVertical) throws Exception {
-        this.personalBoard.placeShip(ship, targetCoordinate, isVertical);
-    }
+    public void initializeFleet() throws Exception {
+        Battleship battleship = new Battleship(Ship.Orientation.VERTICAL);
+        Carrier carrier = new Carrier(Ship.Orientation.VERTICAL);
+        Destroyer destroyer = new Destroyer(Ship.Orientation.HORIZONTAL);
+        Cruiser cruiser = new Cruiser(Ship.Orientation.HORIZONTAL);
+        Submarine submarine = new Submarine(Ship.Orientation.HORIZONTAL);
 
-    /**
-     * Fire on opponent board
-     *
-     * @param opponent   - Player to attack
-     * @param targetCell - Target cell in opponent board
-     * @return boolean - Return false if missed, true if hit
-     */
-    @Override
-    public boolean fire(Player opponent, Coordinate targetCell) {
-        if (!this.personalBoard.canFireAt(targetCell)) {
-            return false;
-        }
-
-        Cell cell = opponent.getPersonalBoard().getCell(targetCell);
-        if (cell.getShip() == null) {
-            this.getTacticalBoard().missedFlag(targetCell);
-            return false;
-        }
-
-        opponent.getPersonalBoard().hitShip(cell.getShip());
-        this.getTacticalBoard().hitFlag(targetCell);
-
-        return true;
-    }
-
-    @Override
-    public PersonalBoard getPersonalBoard() {
-        return this.personalBoard;
-    }
-
-    @Override
-    public TacticalBoard getTacticalBoard() {
-        return this.tacticalBoard;
+        this.placeShip(battleship, new Coordinate(0, 0));
+        this.placeShip(carrier, new Coordinate(3, 3));
+        this.placeShip(destroyer, new Coordinate(5, 5));
+        this.placeShip(cruiser, new Coordinate(4, 8));
+        this.placeShip(submarine, new Coordinate(0, 8));
     }
 
     @Override
@@ -67,26 +33,5 @@ public class IAPlayer extends Player {
     @Override
     public void requestToMoveShip() {
         return;
-    }
-
-    @Override
-    public boolean hasFleet() {
-        return this.getFleet().isEmpty();
-    }
-
-    @Override
-    public Fleet getFleet() {
-        return this.personalBoard.getFleet();
-    }
-
-
-    @Override
-    public String toString() {
-        return "\n\n========== Tactical Board ==========\n" +
-                this.getTacticalBoard() +
-                "\n\n====================================\n" +
-                "\n\n========== Personal Board ==========\n" +
-                this.getPersonalBoard() +
-                "\n\n====================================\n";
     }
 }

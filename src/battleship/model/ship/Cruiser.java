@@ -7,6 +7,10 @@ public class Cruiser extends Ship {
     public final static int SIZE = 4;
     public final static int RANGE = 2;
 
+    public Cruiser(Orientation orientation) {
+        super(orientation);
+    }
+
     @Override
     public int getSize() {
         return SIZE;

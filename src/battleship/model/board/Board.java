@@ -1,5 +1,6 @@
 package battleship.model.board;
 
+import battleship.exception.CellNotEmptyException;
 import battleship.utils.Coordinate;
 
 public abstract class Board {
@@ -17,6 +18,10 @@ public abstract class Board {
                 this.clearCell(coordinate);
             }
         }
+    }
+
+    public Cell getCell(Coordinate coordinate) {
+        return this.cells[coordinate.getX()][coordinate.getY()];
     }
 
     /**
@@ -37,10 +42,6 @@ public abstract class Board {
         return new Coordinate(x, y);
     }
 
-    public Cell getCell(Coordinate coordinate) {
-        return this.cells[coordinate.getX()][coordinate.getY()];
-    }
-
     /**
      * Clear cell by initialize a new Cell in it
      *
@@ -54,14 +55,19 @@ public abstract class Board {
      * Add cell
      *
      * @param cell - Cell
-     * @throws Exception
+     *
+     * @throws CellNotEmptyException
      */
-    protected void addCell(Cell cell) throws Exception {
-        if (this.cells[cell.getX()][cell.getY()].getObject() != null) {
-            throw new Exception("This cell contains an object ! ");
+    protected void addCell(Cell cell) throws CellNotEmptyException {
+        if (!this.canAddCell(cell)) {
+            throw new CellNotEmptyException();
         }
 
         this.cells[cell.getX()][cell.getY()] = cell;
+    }
+
+    protected boolean canAddCell(Cell cell) {
+        return this.cells[cell.getX()][cell.getY()].getObject() == null;
     }
 
     /**
@@ -70,21 +76,21 @@ public abstract class Board {
      * @param cell - Cell to move
      * @param toX  - To X
      * @param toY  - To Y
-     * @throws Exception
+     *
+     * @throws CellNotEmptyException
      */
-    protected void moveCell(Cell cell, int toX, int toY) throws Exception {
-        if (this.cells[toX][toY].getObject() != null) {
-            throw new Exception("This cell contains an object ! ");
+    protected void moveCell(Cell cell, int toX, int toY) throws CellNotEmptyException {
+        if (!canAddCell(this.getCell(new Coordinate(toX, toY)))) {
+            throw new CellNotEmptyException();
         }
 
         int fromX = cell.getX();
         int fromY = cell.getY();
 
-        this.cells[cell.getX()][cell.getY()] = new Cell(cell.getObject(), new Coordinate(toX, toY));
-
-        System.out.printf("Moving from %s:%s, to %s:%s.\n", fromX, fromY, toX, toY);
         Coordinate coordinate = new Coordinate(fromX, fromY);
         this.clearCell(coordinate);
+        this.cells[toX][toY] = new Cell(cell.getObject(), new Coordinate(toX, toY));
+        System.out.printf("Moving from %s:%s, to %s:%s.\n", fromX, fromY, toX, toY);
     }
 
     @Override

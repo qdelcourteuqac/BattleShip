@@ -15,7 +15,9 @@ public class Fleet {
     }
 
     public void addShip(Ship ship) {
-        this.ships.add(ship);
+        if (!this.ships.contains(ship)) {
+            this.ships.add(ship);
+        }
     }
 
     /**
@@ -34,7 +36,7 @@ public class Fleet {
         if (this.isEmpty()) {
             fleetRepresentation.append("\n\nFleet:\n");
             for (Ship ship : this.getShips()) {
-                fleetRepresentation.append(ship.getClass().getSimpleName() + " " + ship.getHited() + "/3, ");
+                fleetRepresentation.append(ship.getClass().getSimpleName() + " " + ship.getHit() + "/3, ");
             }
         }
 

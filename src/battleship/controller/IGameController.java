@@ -1,8 +1,13 @@
 package battleship.controller;
 
+import battleship.model.player.Player;
+
 public interface IGameController {
-    void game() throws Exception;
-    void start() throws Exception;
+    void initializePlayers();
+    boolean turn(Player player, boolean hasOpponentShotHit);
+    void game();
+    void start();
     void stop();
-    boolean isFinished();
+    boolean isEndGame();
+    void displayWinner();
 }

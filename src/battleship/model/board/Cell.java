@@ -25,6 +25,10 @@ public class Cell {
         return (this.object instanceof Flag)? (Flag) this.object : null;
     }
 
+    public Coordinate getCoordinate() {
+        return this.coordinate;
+    }
+
     public int getX() {
         return this.coordinate.getX();
     }
@@ -36,9 +40,5 @@ public class Cell {
     @Override
     public String toString() {
         return this.object == null ? " * " : " " + this.object.toString() + " ";
-    }
-
-    public Coordinate getCoordinate() {
-        return this.coordinate;
     }
 }

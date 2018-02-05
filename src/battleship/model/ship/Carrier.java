@@ -7,6 +7,10 @@ public class Carrier extends Ship {
     public final static int SIZE = 5;
     public final static int RANGE = 2;
 
+    public Carrier(Orientation orientation) {
+        super(orientation);
+    }
+
     @Override
     public int getSize() {
         return SIZE;

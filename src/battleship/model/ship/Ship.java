@@ -2,26 +2,25 @@ package battleship.model.ship;
 
 public abstract class Ship {
 
+    public enum Orientation {
+        VERTICAL, HORIZONTAL
+    }
+
     public abstract int getSize();
     public abstract int getRange();
 
-    protected boolean isVertical;
-    public boolean isAlive;
+    protected Ship.Orientation orientation;
+    protected boolean isAlive;
+    protected int hit;
 
-    protected int hited;
-
-    public Ship() {
-        this.hited = 0;
+    public Ship(Orientation orientation) {
+        this.orientation = orientation;
         this.isAlive = true;
-        this.isVertical = false;
-    }
-
-    public void setOrientation(boolean isVertical) {
-        this.isVertical = isVertical;
+        this.hit = 0;
     }
 
     public boolean isVertical() {
-        return this.isVertical;
+        return this.orientation == Orientation.VERTICAL;
     }
 
     public boolean isAlive() {
@@ -38,15 +37,20 @@ public abstract class Ship {
             return false;
         }
 
-        this.hited++;
-        if (this.hited >= 3) {
+        this.hit++;
+        if (this.hit >= 3) {
             this.isAlive = false;
         }
 
         return true;
     }
 
-    public int getHited() {
-        return this.hited;
+    /**
+     * Get life
+     *
+     * @return int
+     */
+    public int getHit() {
+        return this.hit;
     }
 }

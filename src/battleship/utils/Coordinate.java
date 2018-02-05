@@ -2,8 +2,8 @@ package battleship.utils;
 
 public class Coordinate {
 
-    private final int x;
-    private final int y;
+    private int x;
+    private int y;
 
     public Coordinate(int x, int y) {
         this.x = x;
@@ -16,6 +16,16 @@ public class Coordinate {
 
     public int getY() {
         return this.y;
+    }
+
+    public Coordinate translate(Coordinate offsetCoordinates) {
+        this.x += offsetCoordinates.getX();
+        this.y += offsetCoordinates.getY();
+        return this;
+    }
+
+    public int getLength() {
+        return this.x + this.y;
     }
 
     @Override

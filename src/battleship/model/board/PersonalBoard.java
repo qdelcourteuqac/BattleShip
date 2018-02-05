@@ -1,5 +1,8 @@
 package battleship.model.board;
 
+import battleship.exception.CellNotEmptyException;
+import battleship.exception.CoordinateOutOfBoardException;
+import battleship.exception.ShipOutOfBoardException;
 import battleship.model.ship.Fleet;
 import battleship.model.ship.Ship;
 import battleship.utils.Coordinate;
@@ -21,12 +24,11 @@ public class PersonalBoard extends Board {
      * The ship is removed from the fleet if dead
      *
      * @param ship - Target Ship
-     *
      * @return boolean
      */
     public boolean hitShip(Ship ship) {
         boolean isHit = this.fleet.getShips().contains(ship) && ship.hit();
-        if (!ship.isAlive) {
+        if (!ship.isAlive()) {
             this.fleet.getShips().remove(ship);
             Cell[] cells = this.getCellsOfShip(ship);
             for (Cell cell : cells) {
@@ -37,37 +39,32 @@ public class PersonalBoard extends Board {
         return isHit;
     }
 
-
     /**
      * Place ship on the board
      *
      * @param ship       - Ship to place
      * @param coordinate - Coordinate to place the ship
-     * @param isVertical - Orientation: Vertical if true, horizontal otherwise
+     * @throws CellNotEmptyException
+     * @throws CoordinateOutOfBoardException
+     * @throws ShipOutOfBoardException
      */
-    public void placeShip(Ship ship, Coordinate coordinate, boolean isVertical) throws Exception {
-        if (coordinate.getX() < 0 || coordinate.getX() >= WIDTH || coordinate.getY() < 0 || coordinate.getY() >= HEIGHT) {
-            throw new Exception("X and Y must be between [0, "+(WIDTH-1)+"]");
-        }
+    public void placeShip(Ship ship, Coordinate coordinate) throws CoordinateOutOfBoardException, ShipOutOfBoardException, CellNotEmptyException {
+        canPlaceShip(ship, coordinate);
 
-        ship.setOrientation(isVertical);
         int x = coordinate.getX();
         int y = coordinate.getY();
-
-        if (ship.isVertical()) {
-            if ((y+ship.getSize()) >= HEIGHT) {
-                throw new Exception("Dépassement de la grille");
-            }
-        } else {
-            if ((x+ship.getSize()) >= WIDTH) {
-                throw new Exception("Dépassement de la grille");
-            }
-        }
-
+        Cell[] cells = new Cell[ship.getSize()];
         for (int part = 0; part < ship.getSize(); part++) {
             int xCell = ship.isVertical() ? x : x + part;
             int yCell = ship.isVertical() ? y + part : y;
             Cell cell = new Cell(ship, new Coordinate(xCell, yCell));
+            if (!canAddCell(cell)) {
+                throw new CellNotEmptyException();
+            }
+            cells[part] = cell;
+        }
+
+        for (Cell cell : cells) {
             this.addCell(cell);
         }
 
@@ -75,82 +72,82 @@ public class PersonalBoard extends Board {
     }
 
     /**
+     * Verify if a ship can be placed in a required coordinate
+     *
+     * @param ship - Ship to place
+     * @param coordinate - Coordinate to place
+     *
+     * @return boolean
+     *
+     * @throws CoordinateOutOfBoardException
+     * @throws ShipOutOfBoardException
+     */
+    private boolean canPlaceShip(Ship ship, Coordinate coordinate) throws CoordinateOutOfBoardException, ShipOutOfBoardException {
+        if (coordinate.getX() < 0 || coordinate.getX() >= WIDTH || coordinate.getY() < 0 || coordinate.getY() >= HEIGHT) {
+            throw new CoordinateOutOfBoardException();
+        }
+
+        int x = coordinate.getX();
+        int y = coordinate.getY();
+
+        if (ship.isVertical()) {
+            if ((y + ship.getSize()) > HEIGHT) {
+                throw new ShipOutOfBoardException();
+            }
+        } else {
+            if ((x + ship.getSize()) > WIDTH) {
+                throw new ShipOutOfBoardException();
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Translate Ship with offset coordinates
      *
      * @param ship              - Ship to translate
      * @param offsetCoordinates - Offsets coordinate
-     * @throws Exception
+     * @throws CellNotEmptyException
+     * @throws CoordinateOutOfBoardException
+     * @throws ShipOutOfBoardException
      */
-    public void translateShip(Ship ship, Coordinate offsetCoordinates) throws Exception {
-
-        int xOffset = offsetCoordinates.getX();
-        int yOffset = offsetCoordinates.getY();
-
-        if (xOffset + yOffset > 2) {
+    public void translateShip(Ship ship, Coordinate offsetCoordinates) throws CellNotEmptyException, CoordinateOutOfBoardException, ShipOutOfBoardException {
+        if (offsetCoordinates.getLength() > 2) {
             throw new IllegalArgumentException("You can only perform maximum two cell moving !");
-        }
-
-        if (!this.canTranslateShip(ship, xOffset, yOffset)) {
-            throw new Exception(String.format("Impossible to move ship %s with offset : %d:%d", ship.getClass().getSimpleName(), xOffset, yOffset));
         }
 
         Cell[] cellsToTranslate = this.getCellsOfShip(ship);
 
-        int nbCells = cellsToTranslate.length;
-        Coordinate head = new Coordinate(cellsToTranslate[0].getX(), cellsToTranslate[0].getY());
-        Coordinate queue = new Coordinate(cellsToTranslate[nbCells-1].getX(), cellsToTranslate[nbCells-1].getY());
+        // TODO FIX !!!!
+        // Check if ship can be placed to the required cell
+        //canPlaceShip(ship, cellsToTranslate[0].getCoordinate().translate(offsetCoordinates));
 
-        if ((head.getX()+xOffset) < 0 || (head.getX()+xOffset) >= WIDTH
-                || (queue.getX()+xOffset) < 0 || (queue.getX()+xOffset) >= WIDTH
-                || (head.getY()+yOffset) < 0 || (head.getY()+yOffset) >= HEIGHT
-                || (queue.getY()+yOffset) < 0 || (queue.getY()+yOffset) >= HEIGHT
-                ) {
-            throw new Exception("X and Y must be between [0, "+(WIDTH-1)+"]");
-        }
-
-        if (ship.isVertical()) {
-            if ((head.getY()+ship.getSize()) >= HEIGHT) {
-                throw new Exception("Dépassement de la grille");
-            }
-        } else {
-            if ((head.getX()+ship.getSize()) >= WIDTH) {
-                throw new Exception("Dépassement de la grille");
-            }
+        // Remove ship from the board
+        for (Cell cellToTranslate : cellsToTranslate) {
+            this.clearCell(cellToTranslate.getCoordinate());
         }
 
         try {
+            // Verify for each cell that there is not others ship in desired cells
             for (Cell cellToTranslate : cellsToTranslate) {
-                this.moveCell(cellToTranslate, cellToTranslate.getX() + xOffset, cellToTranslate.getY() + yOffset);
+                if (!this.canAddCell(cellToTranslate)) {
+                    throw new CellNotEmptyException();
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    /**
-     * Return true if ship can be translate, false otherwise
-     *
-     * @param ship    - Ship to translate
-     * @param xOffset - Offset X
-     * @param yOffset - Offset Y
-     * @return boolean
-     */
-    private boolean canTranslateShip(Ship ship, int xOffset, int yOffset) {
-        Cell[] cells = this.getCellsOfShip(ship);
-
-        boolean canTranslate = true;
-
-        // 1st Verification : Search at least one ship in cells in which to translate
-        for (Cell cellToTranslate : cells) {
-            Cell boardCell = this.cells[cellToTranslate.getX() + xOffset][cellToTranslate.getY() + yOffset];
-            if (boardCell.getShip() != null && !boardCell.getShip().equals(ship)) {
-                // One cell contains a ship -> can't translate the ship
-                canTranslate = false;
-                break;
+            // So, let's place the ship in the required position
+            for (Cell cellToTranslate : cellsToTranslate) {
+                cellToTranslate.getCoordinate().translate(offsetCoordinates);
+                this.addCell(cellToTranslate);
             }
+        } catch (CellNotEmptyException e) {
+            // Rollback, if something goes wrong
+            for (Cell cellToTranslate : cellsToTranslate) {
+                this.addCell(cellToTranslate);
+            }
+            throw new CellNotEmptyException();
         }
-
-        return canTranslate;
     }
 
     /**

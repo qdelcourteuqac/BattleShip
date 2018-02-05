@@ -13,12 +13,8 @@ public class TacticalBoard extends Board {
         }
     }
 
-    public void hitFlag(Coordinate targetCoorfinate) {
-        this.getCell(targetCoorfinate).getFlag().setState(Flag.FlagType.HIT);
-    }
-
-    public void missedFlag(Coordinate targetCoordinate) {
-        this.getCell(targetCoordinate).getFlag().setState(Flag.FlagType.MISSED);
+    public Flag getFlag(Coordinate targetCoordinate) {
+        return this.getCell(targetCoordinate).getFlag();
     }
 
     @Override

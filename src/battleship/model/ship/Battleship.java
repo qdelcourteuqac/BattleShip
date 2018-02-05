@@ -7,6 +7,10 @@ public class Battleship extends Ship {
     public final static int SIZE = 2;
     public final static int RANGE = 5;
 
+    public Battleship(Orientation orientation) {
+        super(orientation);
+    }
+
     @Override
     public int getSize() {
         return SIZE;

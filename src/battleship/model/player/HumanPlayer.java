@@ -1,61 +1,58 @@
 package battleship.model.player;
 
-import battleship.model.board.*;
-import battleship.model.ship.Fleet;
-import battleship.model.ship.Ship;
+import battleship.exception.CellNotEmptyException;
+import battleship.exception.CoordinateOutOfBoardException;
+import battleship.exception.ShipOutOfBoardException;
+import battleship.model.board.Board;
+import battleship.model.ship.*;
 import battleship.utils.Coordinate;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class HumanPlayer extends Player {
 
-    private PersonalBoard personalBoard;
-    private TacticalBoard tacticalBoard;
-
-    public HumanPlayer() {
-        this.personalBoard = new PersonalBoard();
-        this.tacticalBoard = new TacticalBoard();
-    }
-
     @Override
-    public void placeShip(Ship ship, Coordinate targetCoordinate, boolean isVertical) throws Exception {
-        this.personalBoard.placeShip(ship, targetCoordinate, isVertical);
-    }
+    public void initializeFleet() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nWelcome in ship placement system !");
 
-    /**
-     * Fire on opponent board
-     *
-     * @param opponent   - Player to attack
-     * @param targetCell - Target cell in opponent board
-     * @return boolean - Return false if missed, true if hit
-     */
-    @Override
-    public boolean fire(Player opponent, Coordinate targetCell) {
-        if (!this.personalBoard.canFireAt(targetCell)) {
-            return false;
+        Class[] ships = new Class[]{Battleship.class, Carrier.class, Destroyer.class, Cruiser.class};
+
+        System.out.printf("%s it's up to you to choose !\n", this.getName());
+        for (Class shipClass : ships) {
+            boolean shipPlaced = false;
+            while (!shipPlaced) {
+                try {
+                    System.out.println(this);
+
+                    System.out.println(shipClass.getSimpleName());
+                    System.out.println("In vertical (y/n) : ");
+                    String response = scanner.nextLine();
+                    Ship.Orientation orientation = response.equals("y") ? Ship.Orientation.VERTICAL : Ship.Orientation.HORIZONTAL;
+
+                    Ship ship = (Ship) shipClass.getConstructor(Ship.Orientation.class).newInstance(orientation);
+
+                    System.out.printf("Place a %s(%d) in (i.e: J2) : ", shipClass.getSimpleName(), ship.getSize());
+
+                    Coordinate targetCoordinate = Board.getCoordinate(scanner.nextLine());
+
+                    this.placeShip(ship, targetCoordinate);
+                    shipPlaced = true;
+                } catch (ShipOutOfBoardException e) {
+                    System.out.println("You cannot place your ship here : is getting out the board");
+                } catch (CoordinateOutOfBoardException e) {
+                    System.out.println("You cannot place your ship here : coordinate are out the board");
+                } catch (CellNotEmptyException e) {
+                    System.out.println("You cannot place your ship here : it's make a collision");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
         }
 
-        Cell cell = opponent.getPersonalBoard().getCell(targetCell);
-        if (cell.getShip() == null) {
-            this.getTacticalBoard().missedFlag(targetCell);
-            return false;
-        }
-
-        opponent.getPersonalBoard().hitShip(cell.getShip());
-        this.getTacticalBoard().hitFlag(targetCell);
-
-        return true;
-    }
-
-    @Override
-    public PersonalBoard getPersonalBoard() {
-        return this.personalBoard;
-    }
-
-    @Override
-    public TacticalBoard getTacticalBoard() {
-        return this.tacticalBoard;
+        scanner.close();
     }
 
     @Override
@@ -66,7 +63,7 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public void requestToMoveShip() throws Exception {
+    public void requestToMoveShip() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Your opponent have missed his shot.");
         System.out.print("Do you want move one of your ships ? (y/n) : ");
@@ -77,52 +74,47 @@ public class HumanPlayer extends Player {
             return;
         }
 
-        System.out.println("Your fleet : ");
+        boolean shipMoved = false;
+        while (!shipMoved) {
+            System.out.println("Your fleet : ");
 
-        ArrayList<Ship> ships = this.getFleet().getShips();
-        for (int i = 0; i < ships.size(); i++) {
-            System.out.printf("%d) %s\n", i, ships.get(i).toString());
+            ArrayList<Ship> ships = this.getFleet().getShips();
+            for (int i = 0; i < ships.size(); i++) {
+                System.out.printf("%d) %s\n", i, ships.get(i).toString());
+            }
+
+            int index;
+            do {
+                System.out.printf("Which one do you want to move ? [0;%d] : ", ships.size() - 1);
+                index = Integer.parseInt(scanner.nextLine());
+            } while (index < 0 || index >= ships.size());
+
+            Ship shipToMove = ships.get(index);
+
+            System.out.println("Enter offset (i.e : 1 1) : ");
+            String offsetsResponse = scanner.nextLine();
+            System.out.println(offsetsResponse);
+
+            String[] offsets = offsetsResponse.split(" ");
+            int x = Integer.parseInt(offsets[0]);
+            int y = Integer.parseInt(offsets[1]);
+            Coordinate offsetCoordinate = new Coordinate(x, y);
+
+            try {
+                // TODO interdire aussi le translate avec 0 0
+                if (offsetCoordinate.getX() != 0 && offsetCoordinate.getY() != 0) {
+                    this.getPersonalBoard().translateShip(shipToMove, offsetCoordinate);
+                    shipMoved = true;
+                }
+            } catch (ShipOutOfBoardException e) {
+                System.out.println("You cannot place your ship here : is getting out the board");
+            } catch (CoordinateOutOfBoardException e) {
+                System.out.println("You cannot place your ship here : coordinate are out the board");
+            } catch (CellNotEmptyException e) {
+                System.out.println("You cannot place your ship here : it's make a collision");
+            }
         }
 
-        int index;
-        do {
-            System.out.printf("Which one do you want to move ? [0;%d]", ships.size() - 1);
-            index = Integer.parseInt(scanner.nextLine());
-        } while (index < 0 || index >= ships.size());
-
-        Ship shipToMove = ships.get(index);
-
-        System.out.println("Enter offset (i.e : 1 1) : ");
-        String offsetsResponse = scanner.nextLine();
-        System.out.println(offsetsResponse);
-
-        String[] offsets = offsetsResponse.split(" ");
-        int x = Integer.parseInt(offsets[0]);
-        int y = Integer.parseInt(offsets[1]);
-        Coordinate offsetCoordinate = new Coordinate(x, y);
-
-        this.getPersonalBoard().translateShip(shipToMove, offsetCoordinate);
-
+        System.out.println(this);
     }
-
-    @Override
-    public boolean hasFleet() {
-        return this.getFleet().isEmpty();
-    }
-
-    @Override
-    public Fleet getFleet() {
-        return this.personalBoard.getFleet();
-    }
-
-    @Override
-    public String toString() {
-        return "\n\n========== Tactical Board ==========\n" +
-                this.getTacticalBoard() +
-                "\n\n====================================\n" +
-                "\n\n========== Personal Board ==========\n" +
-                this.getPersonalBoard() +
-                "\n\n====================================\n";
-    }
-
 }
