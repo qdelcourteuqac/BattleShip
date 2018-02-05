@@ -18,17 +18,13 @@ public class Fleet {
         this.ships.add(ship);
     }
 
+    /**
+     * Return true if there is no more ships, false otherwise
+     *
+     * @return boolean
+     */
     public boolean isEmpty() {
         return !this.ships.isEmpty();
-    }
-
-    public boolean hit(Ship ship) {
-        // TODO: si le bateau n'a plus de vie alors le supprimer de la flotte
-        boolean isHitted = this.ships.contains(ship) && this.ships.get(this.ships.indexOf(ship)).hit();
-        if (!ship.isAlive) {
-            this.ships.remove(ship);
-        }
-        return isHitted;
     }
 
     @Override

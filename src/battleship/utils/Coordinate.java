@@ -1,4 +1,4 @@
-package battleship.model.board;
+package battleship.utils;
 
 public class Coordinate {
 

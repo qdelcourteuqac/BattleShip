@@ -1,6 +1,6 @@
 package battleship.model.player;
 
-import battleship.model.board.Coordinate;
+import battleship.utils.Coordinate;
 import battleship.model.board.PersonalBoard;
 import battleship.model.board.TacticalBoard;
 import battleship.model.ship.Fleet;

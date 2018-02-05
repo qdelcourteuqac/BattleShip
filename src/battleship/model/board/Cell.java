@@ -1,6 +1,7 @@
 package battleship.model.board;
 
 import battleship.model.ship.Ship;
+import battleship.utils.Coordinate;
 
 public class Cell {
 
@@ -10,6 +11,10 @@ public class Cell {
     public Cell(Object object, Coordinate coordinate) {
         this.object = object;
         this.coordinate = coordinate;
+    }
+
+    public Object getObject() {
+        return object;
     }
 
     public Ship getShip() {
@@ -31,5 +36,9 @@ public class Cell {
     @Override
     public String toString() {
         return this.object == null ? " * " : " " + this.object.toString() + " ";
+    }
+
+    public Coordinate getCoordinate() {
+        return this.coordinate;
     }
 }

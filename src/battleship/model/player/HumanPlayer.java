@@ -3,6 +3,7 @@ package battleship.model.player;
 import battleship.model.board.*;
 import battleship.model.ship.Fleet;
 import battleship.model.ship.Ship;
+import battleship.utils.Coordinate;
 
 import java.util.ArrayList;
 import java.util.Scanner;

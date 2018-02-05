@@ -1,14 +1,11 @@
-package battleship.model;
+package battleship.controller;
 
 import battleship.model.board.Board;
-import battleship.model.board.Coordinate;
-import battleship.model.player.HumanPlayer;
+import battleship.utils.Coordinate;
 import battleship.model.player.IAPlayer;
 import battleship.model.player.Player;
 import battleship.model.ship.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class GameController implements IGameController {
@@ -26,7 +23,7 @@ public class GameController implements IGameController {
         this.finish = false;
 
         this.player1 = new IAPlayer();
-        this.player2 = new HumanPlayer();
+        this.player2 = new IAPlayer();
 
         this.player1.setName("Ramzi");
         this.player2.setName("Quentin");
@@ -35,7 +32,8 @@ public class GameController implements IGameController {
     /**
      * Game Logic loop
      */
-    private void game() throws Exception {
+    @Override
+    public void game() throws Exception {
 //        this.initPlayers();
 
 //        this.initFleet();
@@ -43,11 +41,12 @@ public class GameController implements IGameController {
 
         boolean shotHit = true;
 
-        // Tant que la partie n'est pas finie
         while (!this.isFinished()) {
             shotHit = this.turn(this.player1, shotHit);
             shotHit = this.turn(this.player2, shotHit);
         }
+
+        this.displayWinner();
     }
 
     /**
@@ -82,6 +81,9 @@ public class GameController implements IGameController {
 
     /**
      * Init Phase : place fleet on player's board
+     *
+     * Vertical head : bottom
+     * Horizontal head : left
      */
     private void initFleet() throws Exception {
         System.out.println("\nWelcome in ship placement system !");
@@ -107,8 +109,8 @@ public class GameController implements IGameController {
                 if (response.equals("y")) {
                     isVertical = true;
                 }
-                // TODO Is a valid targetCell ?
-                // TODO ArrayOfBoundException throwed
+
+                // TODO gerer exception : le joueur doit rechoisir une case jusqu'a que cela fontionne
                 player.placeShip(ship, targetCoordinate, isVertical);
             }
         }
@@ -118,6 +120,11 @@ public class GameController implements IGameController {
      * Turn for one player
      */
     private boolean turn(Player player, boolean hasOpponentShotHit) throws Exception {
+        // If there is a winner
+        if (this.getWinner() != null) {
+            return true;
+        }
+
         System.out.println("========================== New Turn ==========================");
 
         System.out.printf("Turn of player : %s\n", player.getName());
@@ -131,12 +138,8 @@ public class GameController implements IGameController {
             player.requestToMoveShip();
         }
 
-        // TODO: revoir (peut etre) les messages dans la console
-
         Coordinate targetCoordinate = player.requestToFire();
-
-        System.out.println("Fire on this piece of shit !!!");
-
+        System.out.println("Fire !!!");
         boolean hit;
 
 //        Thread.sleep(100);
@@ -144,22 +147,55 @@ public class GameController implements IGameController {
         if (hit) {
             System.out.println("You hit one of his ships ! Nice shot !");
         } else {
-            System.out.println("You missed ! You'll do better next time ! ...Unless if u're not dead before.. Ahahah !!!");
+            System.out.println("You have missed ! You'll do better next time ! ...Unless if u're not dead before.. Ahahah !!!");
         }
 //        Thread.sleep(400);
 
         // Refresh player board
         System.out.println(player);
 
-        // Does the opponent lose the game ?
-        if (!opponent.hasFleet()) {
-            this.stop();
-        }
         return hit;
     }
 
+    /**
+     * Return the opponent's player
+     *
+     * @param player - Player who want to know its opponent
+     *
+     * @return Player
+     */
     private Player getOpponent(Player player) {
         return (player == this.player1) ? this.player2 : this.player1;
+    }
+
+    /**
+     * Return player who win the game
+     *
+     * @return Player|null
+     */
+    private Player getWinner() {
+        if (!this.player1.hasFleet()) {
+            this.stop();
+            return this.player2;
+        }
+        if (!this.player2.hasFleet()) {
+            this.stop();
+            return this.player1;
+        }
+
+        return null;
+    }
+
+    /**
+     * Display winner of the game
+     */
+    private void displayWinner() {
+        Player winner = this.getWinner();
+        if (winner != null) {
+            System.out.println("====================================");
+            System.out.println("======== We have a winner !!!========\n");
+            System.out.println("           " + winner.getName() + " !!!");
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 package battleship.model.board;
 
+import battleship.utils.Coordinate;
+
 public class TacticalBoard extends Board {
 
     public TacticalBoard() {
