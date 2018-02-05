@@ -31,6 +31,7 @@ public abstract class Board {
      * @param key - Cell key
      */
     public static Coordinate getCoordinate(String key) {
+        key = key.toUpperCase();
         if (!key.matches("^[A-J]([1-9]|10)$")) {
             throw new IllegalArgumentException(String.format("The matching key \"%s\" doesn't exists", key));
         }
