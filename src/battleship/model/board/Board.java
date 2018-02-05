@@ -4,8 +4,8 @@ import battleship.model.ship.Ship;
 
 public abstract class Board {
 
-    protected static int HEIGHT = 10;
-    protected static int WIDTH = 10;
+    public static int HEIGHT = 10;
+    public static int WIDTH = 10;
 
     protected Cell[][] cells;
 

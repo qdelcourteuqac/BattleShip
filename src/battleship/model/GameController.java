@@ -3,6 +3,7 @@ package battleship.model;
 import battleship.model.board.Board;
 import battleship.model.board.Coordinate;
 import battleship.model.player.HumanPlayer;
+import battleship.model.player.IAPlayer;
 import battleship.model.player.Player;
 import battleship.model.ship.*;
 
@@ -24,11 +25,11 @@ public class GameController implements IGameController {
         this.scanner = new Scanner(System.in);
         this.finish = false;
 
-        this.player1 = new HumanPlayer();
+        this.player1 = new IAPlayer();
         this.player2 = new HumanPlayer();
 
-        this.player1.setName("Player 1");
-        this.player2.setName("Player 2");
+        this.player1.setName("Ramzi");
+        this.player2.setName("Quentin");
     }
 
     /**
@@ -36,7 +37,6 @@ public class GameController implements IGameController {
      */
     private void game() throws Exception {
 //        this.initPlayers();
-        this.initPlayersMock();
 
 //        this.initFleet();
         this.initFleetMock();
@@ -60,11 +60,6 @@ public class GameController implements IGameController {
         this.player2.setName(this.scanner.nextLine());
     }
 
-    private void initPlayersMock() {
-        this.player1.setName("Ramzi");
-        this.player2.setName("Quentin");
-    }
-
     private void initFleetMock() throws Exception {
         Player[] players = new Player[]{this.player1, this.player2};
 
@@ -74,7 +69,6 @@ public class GameController implements IGameController {
             Carrier carrier = Carrier.class.newInstance();
             Destroyer destroyer = Destroyer.class.newInstance();
             Cruiser cruiser = Cruiser.class.newInstance();
-
 
             // TODO Is a valid targetCell ?
             // TODO ArrayOfBoundException throwed
@@ -124,6 +118,8 @@ public class GameController implements IGameController {
      * Turn for one player
      */
     private boolean turn(Player player, boolean hasOpponentShotHit) throws Exception {
+        System.out.println("========================== New Turn ==========================");
+
         System.out.printf("Turn of player : %s\n", player.getName());
         Player opponent = this.getOpponent(player);
 
@@ -143,14 +139,14 @@ public class GameController implements IGameController {
 
         boolean hit;
 
-        Thread.sleep(100);
+//        Thread.sleep(100);
         hit = player.fire(opponent, targetCoordinate);
         if (hit) {
             System.out.println("You hit one of his ships ! Nice shot !");
         } else {
             System.out.println("You missed ! You'll do better next time ! ...Unless if u're not dead before.. Ahahah !!!");
         }
-        Thread.sleep(400);
+//        Thread.sleep(400);
 
         // Refresh player board
         System.out.println(player);
@@ -159,7 +155,6 @@ public class GameController implements IGameController {
         if (!opponent.hasFleet()) {
             this.stop();
         }
-
         return hit;
     }
 
