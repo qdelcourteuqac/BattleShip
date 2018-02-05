@@ -18,12 +18,23 @@ public class Coordinate {
         return this.y;
     }
 
+    /**
+     * Translate coordinate with offsets
+     *
+     * @param offsetCoordinates - Offsets
+     * @return Coordinate
+     */
     public Coordinate translate(Coordinate offsetCoordinates) {
         this.x += offsetCoordinates.getX();
         this.y += offsetCoordinates.getY();
         return this;
     }
 
+    /**
+     * Return length of Coordinate by simple operation
+     *
+     * @return int
+     */
     public int getLength() {
         return this.x + this.y;
     }

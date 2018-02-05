@@ -52,8 +52,6 @@ public abstract class Player {
 
     /**
      * Implement logic to move ship with user interaction
-     *
-     * @throws Exception
      */
     public abstract void requestToMoveShip();
 

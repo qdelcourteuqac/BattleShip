@@ -27,14 +27,13 @@ public class GameController implements IGameController {
      */
     @Override
     public void game() {
-        // TODO FIX !
-//        this.initializePlayers();
+        this.initializePlayers();
 
         // Init player's fleet
         this.player1.initializeFleet();
         this.player2.initializeFleet();
 
-        // Previous player has been hit
+        // Previous player has been hit - true as default for correct execution
         boolean isHit = true;
 
         while (!this.isEndGame()) {

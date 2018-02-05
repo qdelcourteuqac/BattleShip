@@ -1,8 +1,6 @@
 package battleship.model.player;
 
-import battleship.exception.CellNotEmptyException;
-import battleship.exception.CoordinateOutOfBoardException;
-import battleship.exception.ShipOutOfBoardException;
+import battleship.exception.*;
 import battleship.model.board.Board;
 import battleship.model.ship.*;
 import battleship.utils.Coordinate;
@@ -93,7 +91,6 @@ public class HumanPlayer extends Player {
 
             System.out.println("Enter offset (i.e : 1 1) : ");
             String offsetsResponse = scanner.nextLine();
-            System.out.println(offsetsResponse);
 
             String[] offsets = offsetsResponse.split(" ");
             int x = Integer.parseInt(offsets[0]);
@@ -101,17 +98,16 @@ public class HumanPlayer extends Player {
             Coordinate offsetCoordinate = new Coordinate(x, y);
 
             try {
-                // TODO interdire aussi le translate avec 0 0
-                if (offsetCoordinate.getX() != 0 && offsetCoordinate.getY() != 0) {
-                    this.getPersonalBoard().translateShip(shipToMove, offsetCoordinate);
-                    shipMoved = true;
-                }
+                this.getPersonalBoard().translateShip(shipToMove, offsetCoordinate);
+                shipMoved = true;
             } catch (ShipOutOfBoardException e) {
                 System.out.println("You cannot place your ship here : is getting out the board");
             } catch (CoordinateOutOfBoardException e) {
                 System.out.println("You cannot place your ship here : coordinate are out the board");
             } catch (CellNotEmptyException e) {
                 System.out.println("You cannot place your ship here : it's make a collision");
+            } catch (LimitTranslationException | NullTranslationException e) {
+                System.out.println(e.getMessage());
             }
         }
 

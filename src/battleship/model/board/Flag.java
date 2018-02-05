@@ -14,6 +14,11 @@ public class Flag {
         this.state = FlagType.NONE;
     }
 
+    /**
+     * Change FlagType of Flag
+     *
+     * @param state - New state flag
+     */
     public void setState(FlagType state) {
         this.state = state;
     }

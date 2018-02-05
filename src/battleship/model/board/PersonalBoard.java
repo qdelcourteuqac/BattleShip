@@ -1,8 +1,6 @@
 package battleship.model.board;
 
-import battleship.exception.CellNotEmptyException;
-import battleship.exception.CoordinateOutOfBoardException;
-import battleship.exception.ShipOutOfBoardException;
+import battleship.exception.*;
 import battleship.model.ship.Fleet;
 import battleship.model.ship.Ship;
 import battleship.utils.Coordinate;
@@ -12,6 +10,7 @@ public class PersonalBoard extends Board {
     private Fleet fleet;
 
     public PersonalBoard() {
+        super();
         this.fleet = new Fleet();
     }
 
@@ -83,6 +82,7 @@ public class PersonalBoard extends Board {
      * @throws ShipOutOfBoardException
      */
     private boolean canPlaceShip(Ship ship, Coordinate coordinate) throws CoordinateOutOfBoardException, ShipOutOfBoardException {
+        System.out.println("Check in : "+coordinate);
         if (coordinate.getX() < 0 || coordinate.getX() >= WIDTH || coordinate.getY() < 0 || coordinate.getY() >= HEIGHT) {
             throw new CoordinateOutOfBoardException();
         }
@@ -108,20 +108,26 @@ public class PersonalBoard extends Board {
      *
      * @param ship              - Ship to translate
      * @param offsetCoordinates - Offsets coordinate
-     * @throws CellNotEmptyException
+     * @throws NullTranslationException
+     * @throws LimitTranslationException
      * @throws CoordinateOutOfBoardException
      * @throws ShipOutOfBoardException
+     * @throws CellNotEmptyException
      */
-    public void translateShip(Ship ship, Coordinate offsetCoordinates) throws CellNotEmptyException, CoordinateOutOfBoardException, ShipOutOfBoardException {
+    public void translateShip(Ship ship, Coordinate offsetCoordinates) throws NullTranslationException, LimitTranslationException, CoordinateOutOfBoardException, ShipOutOfBoardException, CellNotEmptyException {
+        if (offsetCoordinates.getX() == 0 && offsetCoordinates.getY() == 0) {
+            throw new NullTranslationException();
+        }
+
         if (offsetCoordinates.getLength() > 2) {
-            throw new IllegalArgumentException("You can only perform maximum two cell moving !");
+            throw new LimitTranslationException();
         }
 
         Cell[] cellsToTranslate = this.getCellsOfShip(ship);
 
-        // TODO FIX !!!!
         // Check if ship can be placed to the required cell
-        //canPlaceShip(ship, cellsToTranslate[0].getCoordinate().translate(offsetCoordinates));
+        Coordinate checkCoord = new Coordinate(cellsToTranslate[0].getCoordinate().getX(), cellsToTranslate[0].getCoordinate().getY());
+        canPlaceShip(ship, checkCoord.translate(offsetCoordinates));
 
         // Remove ship from the board
         for (Cell cellToTranslate : cellsToTranslate) {
@@ -129,7 +135,7 @@ public class PersonalBoard extends Board {
         }
 
         try {
-            // Verify for each cell that there is not others ship in desired cells
+            // Verify for each cell that there is not other ship in desired cells
             for (Cell cellToTranslate : cellsToTranslate) {
                 if (!this.canAddCell(cellToTranslate)) {
                     throw new CellNotEmptyException();
@@ -138,7 +144,9 @@ public class PersonalBoard extends Board {
 
             // So, let's place the ship in the required position
             for (Cell cellToTranslate : cellsToTranslate) {
+                // Update new coordinate of ship
                 cellToTranslate.getCoordinate().translate(offsetCoordinates);
+                // Add (move) cell to another position
                 this.addCell(cellToTranslate);
             }
         } catch (CellNotEmptyException e) {
@@ -176,10 +184,10 @@ public class PersonalBoard extends Board {
     }
 
     /**
-     * The player can fire at a target only if this cell is in his fire zone
+     * The player can fire at a target only if target cell is in his fire zone
      *
      * @param targetCoordinate - Target coordinate on board
-     * @return boolean - Return true if the player can fire at specified cell
+     * @return boolean - Return true if the player can fire at specified cell, false otherwise
      */
     public boolean canFireAt(Coordinate targetCoordinate) {
         boolean[][] matrix = new boolean[WIDTH][HEIGHT];
