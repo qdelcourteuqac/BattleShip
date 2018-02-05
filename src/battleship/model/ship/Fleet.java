@@ -24,7 +24,11 @@ public class Fleet {
 
     public boolean hit(Ship ship) {
         // TODO: si le bateau n'a plus de vie alors le supprimer de la flotte
-        return (this.ships.contains(ship)) && this.ships.get(this.ships.indexOf(ship)).hit();
+        boolean isHitted = this.ships.contains(ship) && this.ships.get(this.ships.indexOf(ship)).hit();
+        if (!ship.isAlive) {
+            this.ships.remove(ship);
+        }
+        return isHitted;
     }
 
     @Override
@@ -33,7 +37,7 @@ public class Fleet {
 
         if (this.isEmpty()) {
             fleetRepresentation.append("\n\nFleet:\n");
-            for (Ship ship: this.getShips()) {
+            for (Ship ship : this.getShips()) {
                 fleetRepresentation.append(ship.getClass().getSimpleName() + " " + ship.getHited() + "/3, ");
             }
         }

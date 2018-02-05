@@ -11,20 +11,16 @@ public class TacticalBoard extends Board {
         }
     }
 
-    public void hitFlag(String targetCell) {
-        this.getCell(targetCell).getFlag().setState(Flag.HIT);
+    public void hitFlag(Coordinate targetCoorfinate) {
+        this.getCell(targetCoorfinate).getFlag().setState(Flag.FlagType.HIT);
     }
 
-    public void missedFlag(String targetCell) {
-        this.getCell(targetCell).getFlag().setState(Flag.MISSED);
+    public void missedFlag(Coordinate targetCoordinate) {
+        this.getCell(targetCoordinate).getFlag().setState(Flag.FlagType.MISSED);
     }
 
     @Override
     public String toString() {
-        StringBuilder tacticalBoardRepresentation = new StringBuilder();
-
-        tacticalBoardRepresentation.append(super.toString());
-
-        return tacticalBoardRepresentation.toString();
+        return super.toString();
     }
 }

@@ -19,21 +19,13 @@ public abstract class Board {
         }
     }
 
-    protected Cell getCell(Coordinate coordinate) {
-        return this.cells[coordinate.getX()][coordinate.getY()];
-    }
-
-    public Cell getCell(String key) {
-        return this.getCell(this.getCoordinate(key));
-    }
-
     /**
      * Input format : from A1 to J10
      * where 10 is the max value in x
      *
      * @param key - Cell key
      */
-    protected Coordinate getCoordinate(String key) {
+    public static Coordinate getCoordinate(String key) {
         if (!key.matches("^[A-J]([1-9]|10)$")) {
             throw new IllegalArgumentException(String.format("The matching key \"%s\" doesn't exists", key));
         }
@@ -43,6 +35,14 @@ public abstract class Board {
         int y = WIDTH - (Character.getNumericValue(key.charAt(0)) - Character.getNumericValue('A')) - 1;
 
         return new Coordinate(x, y);
+    }
+
+    public Cell getCell(Coordinate coordinate) {
+        return this.cells[coordinate.getX()][coordinate.getY()];
+    }
+
+    public Cell getCell(String key) {
+        return this.getCell(getCoordinate(key));
     }
 
     /**
@@ -58,8 +58,8 @@ public abstract class Board {
      * Add cell
      *
      * @param cell - Cell
-     * @param x - x
-     * @param y - y
+     * @param x    - x
+     * @param y    - y
      * @throws Exception
      */
     private void addCell(Cell cell, int x, int y) throws Exception {
@@ -74,8 +74,8 @@ public abstract class Board {
      * Move cell to X, Y position on the board
      *
      * @param cell - Cell to move
-     * @param toX - To X
-     * @param toY - To Y
+     * @param toX  - To X
+     * @param toY  - To Y
      * @throws Exception
      */
     private void moveCell(Cell cell, int toX, int toY) throws Exception {
@@ -91,41 +91,35 @@ public abstract class Board {
     /**
      * Place ship on the board
      *
-     * @param ship - Ship to place
+     * @param ship       - Ship to place
      * @param coordinate - Coordinate to place the ship
      * @param isVertical - Orientation: Vertical if true, horizontal otherwise
      */
-    public void placeShip(Ship ship, Coordinate coordinate, boolean isVertical) {
+    public void placeShip(Ship ship, Coordinate coordinate, boolean isVertical) throws Exception {
         // TODO: Attention en placant un bateau vers le bord de la map,vérifier qu'il n'en sort pas avant de la placer
         for (int part = 0; part < ship.getSize(); part++) {
-            try {
-                int x = coordinate.getX();
-                int y = coordinate.getY();
+            int x = coordinate.getX();
+            int y = coordinate.getY();
 
-                int xCell = isVertical ? x : x + part;
-                int yCell = isVertical ? y + part : y;
-                Cell cell = new Cell(ship, new Coordinate(xCell, yCell));
-                this.addCell(cell, xCell, yCell);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            int xCell = isVertical ? x : x + part;
+            int yCell = isVertical ? y + part : y;
+            Cell cell = new Cell(ship, new Coordinate(xCell, yCell));
+            this.addCell(cell, xCell, yCell);
         }
     }
 
-
-    public void placeShip(Ship ship, String targetCell, boolean isVertical) {
-        this.placeShip(ship, this.getCoordinate(targetCell), isVertical);
-    }
-
     /**
-     * Translate Ship with offset on X and Y
+     * Translate Ship with offset coordinates
      *
-     * @param ship - Ship to translate
-     * @param xOffset - Offset X
-     * @param yOffset - Offset Y
+     * @param ship              - Ship to translate
+     * @param offsetCoordinates - Offsets coordinate
      * @throws Exception
      */
-    public void translateShip(Ship ship, int xOffset, int yOffset) throws Exception {
+    public void translateShip(Ship ship, Coordinate offsetCoordinates) throws Exception {
+
+        int xOffset = offsetCoordinates.getX();
+        int yOffset = offsetCoordinates.getY();
+
         if (xOffset + yOffset > 2) {
             throw new IllegalArgumentException("You can only perform maximum two cell moving !");
         }
@@ -148,7 +142,7 @@ public abstract class Board {
     /**
      * Return true if ship can be translate, false otherwise
      *
-     * @param ship - Ship to translate
+     * @param ship    - Ship to translate
      * @param xOffset - Offset X
      * @param yOffset - Offset Y
      * @return boolean
@@ -196,10 +190,10 @@ public abstract class Board {
     /**
      * The player can fire at a target only if this cell is in his fire zone
      *
-     * @param targetCell - Target cell on board
+     * @param targetCoordinate - Target coordinate on board
      * @return boolean - Return true if the player can fire at specified cell
      */
-    public boolean canFireAt(String targetCell) {
+    public boolean canFireAt(Coordinate targetCoordinate) {
         boolean[][] matrix = new boolean[WIDTH][HEIGHT];
 
         for (int y = 0; y < HEIGHT; y++) {
@@ -209,26 +203,24 @@ public abstract class Board {
                 if (cell.getShip() != null) {
                     matrix[x][y] = true;
                     for (int k = 1; k <= cell.getShip().getRange(); k++) {
-                        if ((x+k) < WIDTH) {
-                            matrix[x+k][y] = true;
+                        if ((x + k) < WIDTH) {
+                            matrix[x + k][y] = true;
                         }
-			            if ((x-k) >= 0) {
-			                matrix[x-k][y] = true;
-			            }
-                        if ((y+k) < HEIGHT) {
-                            matrix[x][y+k] = true;
+                        if ((x - k) >= 0) {
+                            matrix[x - k][y] = true;
                         }
-                        if ((y-k) >= 0) {
-			                matrix[x][y-k] = true;
-			            }
+                        if ((y + k) < HEIGHT) {
+                            matrix[x][y + k] = true;
+                        }
+                        if ((y - k) >= 0) {
+                            matrix[x][y - k] = true;
+                        }
                     }
                 }
             }
         }
 
-        Coordinate coordinate = this.getCoordinate(targetCell);
-
-        return matrix[coordinate.getX()][coordinate.getY()];
+        return matrix[targetCoordinate.getX()][targetCoordinate.getY()];
     }
 
     @Override

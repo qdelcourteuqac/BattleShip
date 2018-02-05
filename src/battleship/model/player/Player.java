@@ -1,6 +1,10 @@
 package battleship.model.player;
 
-import battleship.model.board.BoardController;
+import battleship.model.board.Coordinate;
+import battleship.model.board.PersonalBoard;
+import battleship.model.board.TacticalBoard;
+import battleship.model.ship.Fleet;
+import battleship.model.ship.Ship;
 
 public abstract class Player {
 
@@ -14,7 +18,7 @@ public abstract class Player {
         this.name = name;
     }
 
-    public abstract BoardController getBoardController();
+    public abstract void placeShip(Ship ship, Coordinate targetCell, boolean isVertical) throws Exception;
 
     /**
      * Return false if all of his ships are destroyed
@@ -23,8 +27,16 @@ public abstract class Player {
      */
     public abstract boolean hasFleet();
 
-    @Override
-    public String toString() {
-        return this.getBoardController().toString();
-    }
+    public abstract Fleet getFleet();
+
+    public abstract boolean fire(Player opponent, Coordinate targetCell);
+
+
+    public abstract PersonalBoard getPersonalBoard();
+
+    public abstract TacticalBoard getTacticalBoard();
+
+    public abstract Coordinate requestToFire();
+
+    public abstract void requestToMoveShip() throws Exception;
 }

@@ -2,17 +2,19 @@ package battleship.model.board;
 
 public class Flag {
 
-    public final static String NONE = "none";
-    public final static String MISSED = "missed";
-    public final static String HIT = "hit";
-
-    private String state;
-
-    public Flag() {
-        this.state = NONE;
+    public enum FlagType {
+        NONE,
+        MISSED,
+        HIT
     }
 
-    public void setState(String state) {
+    private FlagType state;
+
+    Flag() {
+        this.state = FlagType.NONE;
+    }
+
+    public void setState(FlagType state) {
         this.state = state;
     }
 
@@ -26,6 +28,7 @@ public class Flag {
             case HIT:
                 return "H";
         }
-        return "0";
+        throw new IllegalStateException("Illegal type, this should never append !");
     }
+
 }

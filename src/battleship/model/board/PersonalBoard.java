@@ -20,8 +20,8 @@ public class PersonalBoard extends Board {
     }
 
     @Override
-    public void placeShip(Ship ship, Coordinate coordinate, boolean isVertical) {
-        super.placeShip(ship, coordinate, isVertical);
+    public void placeShip(Ship ship, Coordinate targetCoordinate, boolean isVertical) throws Exception {
+        super.placeShip(ship, targetCoordinate, isVertical);
         this.fleet.addShip(ship);
     }
 

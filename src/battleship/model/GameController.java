@@ -1,15 +1,18 @@
 package battleship.model;
 
+import battleship.model.board.Board;
+import battleship.model.board.Coordinate;
 import battleship.model.player.HumanPlayer;
 import battleship.model.player.Player;
 import battleship.model.ship.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class GameController implements IGameController {
 
-    private Scanner scanner = new Scanner(System.in);
+    private Scanner scanner;
 
     private boolean finish;
 
@@ -18,6 +21,7 @@ public class GameController implements IGameController {
 
 
     public GameController() {
+        this.scanner = new Scanner(System.in);
         this.finish = false;
 
         this.player1 = new HumanPlayer();
@@ -30,19 +34,19 @@ public class GameController implements IGameController {
     /**
      * Game Logic loop
      */
-    private void game() {
-        //Pas obligatoire
-        //this.initPlayers();
+    private void game() throws Exception {
+//        this.initPlayers();
+        this.initPlayersMock();
 
-        this.initFleet();
+//        this.initFleet();
+        this.initFleetMock();
 
         boolean shotHit = true;
 
         // Tant que la partie n'est pas finie
-        while(!this.isFinished()) {
+        while (!this.isFinished()) {
             shotHit = this.turn(this.player1, shotHit);
             shotHit = this.turn(this.player2, shotHit);
-            this.stop();
         }
     }
 
@@ -56,10 +60,36 @@ public class GameController implements IGameController {
         this.player2.setName(this.scanner.nextLine());
     }
 
+    private void initPlayersMock() {
+        this.player1.setName("Ramzi");
+        this.player2.setName("Quentin");
+    }
+
+    private void initFleetMock() throws Exception {
+        Player[] players = new Player[]{this.player1, this.player2};
+
+        for (Player player : players) {
+
+            Battleship battleship = Battleship.class.newInstance();
+            Carrier carrier = Carrier.class.newInstance();
+            Destroyer destroyer = Destroyer.class.newInstance();
+            Cruiser cruiser = Cruiser.class.newInstance();
+
+
+            // TODO Is a valid targetCell ?
+            // TODO ArrayOfBoundException throwed
+            player.placeShip(battleship, new Coordinate(0, 0), true);
+            player.placeShip(carrier, new Coordinate(3, 3), true);
+            player.placeShip(destroyer, new Coordinate(5, 5), false);
+            player.placeShip(cruiser, new Coordinate(4, 8), false);
+        }
+    }
+
+
     /**
      * Init Phase : place fleet on player's board
      */
-    private void initFleet() {
+    private void initFleet() throws Exception {
         System.out.println("\nWelcome in ship placement system !");
 
         Player[] players = new Player[]{this.player1, this.player2};
@@ -70,23 +100,22 @@ public class GameController implements IGameController {
             System.out.printf("%s it's to you to choose !\n", player.getName());
             for (Class shipClass : ships) {
                 System.out.println(player);
-                try {
-                    Ship ship = (Ship) shipClass.newInstance();
+                Ship ship = (Ship) shipClass.newInstance();
 
-                    System.out.printf("Place a %s(%d) in (i.e: J2) : ", shipClass.getSimpleName(), ship.getSize());
-                    String targetCell = this.scanner.nextLine();
-                    System.out.println("In vertical (y/n) : ");
-                    String response = this.scanner.nextLine();
-                    boolean isVertical = false;
-                    if (response.equals("y")) {
-                        isVertical = true;
-                    }
-                    player.getBoardController().getPersonalBoard().placeShip(ship, targetCell, isVertical);
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                System.out.printf("Place a %s(%d) in (i.e: J2) : ", shipClass.getSimpleName(), ship.getSize());
+
+                Coordinate targetCoordinate = Board.getCoordinate(this.scanner.nextLine());
+
+                System.out.println("In vertical (y/n) : ");
+                String response = this.scanner.nextLine();
+
+                boolean isVertical = false;
+                if (response.equals("y")) {
+                    isVertical = true;
                 }
+                // TODO Is a valid targetCell ?
+                // TODO ArrayOfBoundException throwed
+                player.placeShip(ship, targetCoordinate, isVertical);
             }
         }
     }
@@ -94,81 +123,52 @@ public class GameController implements IGameController {
     /**
      * Turn for one player
      */
-    private boolean turn(Player player, boolean hasOpponentShotHit) {
+    private boolean turn(Player player, boolean hasOpponentShotHit) throws Exception {
         System.out.printf("Turn of player : %s\n", player.getName());
         Player opponent = this.getOpponent(player);
 
         // Display player board
         System.out.println(player);
 
+        // The current player have the possibility to move one of his ships
         if (!hasOpponentShotHit) {
-            // The current player have the possibility to move one of his ships
-            // TODO: terminer cette étape
-            System.out.println("Your opponent have missed his shot.");
-            System.out.print("Do you want move one of your ships ? (y/n) : ");
-            String response = this.scanner.nextLine();
-            if (response.equals("y")) {
-                System.out.println("Your fleet : ");
-                ArrayList<Ship> ships = player.getBoardController().getFleet().getShips();
-                for (int i = 0; i < ships.size(); i++) {
-                    System.out.printf("%d) %s\n", i, ships.get(i).toString());
-                }
-                System.out.println("Which one do you want to move ? : ");
-                int index = this.scanner.nextInt();
-                if (ships.get(index) != null) {
-                    System.out.print("You choose : " + ships.get(index).toString() + ". Are you sure ? (y/n)");
-                    String responseShip = this.scanner.nextLine();
-                    if (responseShip.equals("y")) {
-                        System.out.println("Enter offset (i.e : 1 1) : ");
-                        String offsetsResponse = this.scanner.nextLine();
-                        System.out.println(offsetsResponse);
-                        String[] offsets = offsetsResponse.split(" ");
-                        try {
-                            player.getBoardController().getPersonalBoard().translateShip(ships.get(index), Integer.parseInt(offsets[0]), Integer.parseInt(offsets[1]));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
+            player.requestToMoveShip();
         }
 
         // TODO: revoir (peut etre) les messages dans la console
-        System.out.print("\nType the target cell to fire (i.e : I3) : ");
-        String targetCell = this.scanner.nextLine();
+
+        Coordinate targetCoordinate = player.requestToFire();
+
         System.out.println("Fire on this piece of shit !!!");
 
-        boolean hit = false;
-        try {
-            Thread.sleep(2000);
-            hit = player.getBoardController().fire(opponent, targetCell);
-            if (hit) {
-                System.out.println("You hit one of his ships ! Nice shot !");
-            } else {
-                System.out.println("You missed ! You'll do better next time ! ...Unless if u're not dead before.. Ahahah !!!");
-            }
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        boolean hit;
+
+        Thread.sleep(100);
+        hit = player.fire(opponent, targetCoordinate);
+        if (hit) {
+            System.out.println("You hit one of his ships ! Nice shot !");
+        } else {
+            System.out.println("You missed ! You'll do better next time ! ...Unless if u're not dead before.. Ahahah !!!");
         }
+        Thread.sleep(400);
 
         // Refresh player board
         System.out.println(player);
 
+        // Does the opponent lose the game ?
         if (!opponent.hasFleet()) {
             this.stop();
-            //Le joueur en cours a alors gagné la partie
         }
 
         return hit;
     }
 
     private Player getOpponent(Player player) {
-        return (player == this.player1)? this.player2 : this.player1;
+        return (player == this.player1) ? this.player2 : this.player1;
     }
 
     @Override
-    public void start() {
+    public void start() throws Exception {
         this.finish = false;
         this.game();
     }
